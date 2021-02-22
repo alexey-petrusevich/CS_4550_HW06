@@ -1,0 +1,18 @@
+[Unit]
+Description=HW05 Elixir Practice
+
+[Service]
+Type=simple
+User=hw05
+Group=practice
+Restart=on-failure
+Environment=MIX_ENV=prod
+Environment=PORT=4801
+Environment=PROD=true
+Environment=LANG=en_US.UTF-8
+
+WorkingDirectory=/home/hw05/hw05/main
+ExecStart=/bin/bash /home/hw05/hw05/main/start.sh
+
+[Install]
+WantedBy=multi-user.target
