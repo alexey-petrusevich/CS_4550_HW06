@@ -1,13 +1,45 @@
 defmodule FourDigits.Game do
 
   # returns new game?
-  def new() do
+  #  def new() do
+  #    %{
+  #      guesses: [],
+  #      secret: generateSecret(),
+  #      hints: [],
+  #      status: ""
+  #    }
+  #  end
+
+  # TODO: figure out where to put the global statistcs map??
+  # TODO: maybe use backup agent???
+
+  def new do
     %{
-      guesses: [],
-      secret: generateSecret(),
-      hints: [],
-      status: ""
+      playerGuesses: %{
+        p1: [],
+        p2: [],
+        p3: [],
+        p4: []
+      },
+      playerHints: %{
+        p1: [],
+        p2: [],
+        p3: [],
+        p4: []
+      },
+      playerNames: [],
+      gameName: "",
+      gameState: "", # set up, set up max (4 players joined),
+      # waiting for guesses, guesses submitted, gameWon, gameLost
+      secret: generateSecret()
     }
+  end
+
+  # TODO: implement state changes as pure functions (oldState, event) -> newState
+
+  def playersReachedLimit(oldState, event) do:
+
+    newState = Objects.copy(oldsState, {gameState: setUpMax})
   end
 
   # replacement for FourDigits.js version of makeGuess

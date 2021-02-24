@@ -13,6 +13,10 @@ Specifically:
 - notions of "guesses" similar to "guesses" in hangman;
  */
 
+// TODO: update the game such that it gets username and game name before
+// TODO: proceeding to the game
+// TODO: add button select - player or observer
+
 function FourDigits() {
     const [gameState, setGameState] = useState({
         guesses: [],
@@ -127,6 +131,9 @@ function FourDigits() {
     function ResultTable({guesses, hints}) {
         let guessesHints = [];
 
+        // TODO: replace this with for-each loop???
+        // TODO: to display guesses and hints based on specifications
+        // TODO: remove counter, add columns for each user (guess and hint pair for each player)
         for (let i = 0; i < 8; ++i) {
             guessesHints.push(
                 <div className="row">
