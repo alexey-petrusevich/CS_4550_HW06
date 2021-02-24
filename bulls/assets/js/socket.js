@@ -1,14 +1,19 @@
 import {Socket} from "phoenix";
 
-let socket = new Socket("/socket", {params: {token: ""}})
+let socket = new Socket(
+    "/socket",
+    {params: {token: ""}}
+);
 socket.connect()
 
 let channel = socket.channel("game:1", {})
 
 let state = {
-    guesses: [],
-    hints: [],
-    status: ""
+    playerGuesses: {p1: [], p2: {}, p3: [], p4: []},
+    playerHints: {p1: [], p2: {}, p3: [], p4: []},
+    playerNames: [],
+    gameName: "",
+    gameState: ""
 }
 
 let callback = null;
@@ -22,33 +27,38 @@ function state_update(st) {
 }
 
 export function ch_join(cb) {
-    console.log("ch_join called cb: " + cb)
     callback = cb;
-    console.log("calling callback")
     callback(state)
 }
 
-export function ch_push(guess) {
-    console.log("ch_push called guess: " + guess)
-    channel.push("guess", guess)
+export function ch_login(playerName, gameName) {
+    channel.push("login", {playerName: playerName, gameName: gameName})
         .receive("ok", state_update)
-        .receive("error", resp => console.log("unable to push", resp));
+        .receive("error", resp => {
+            console.log("unable to login", resp)
+        });
 }
 
-export function ch_reset() {
-    console.log("ch_reset called")
-    channel.push("reset", {})
+export function ch_push(guess) {
+    channel.push("guess", guess)
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to push", resp)
         });
 }
-console.log("calling channel.join")
+
+export function ch_reset() {
+    channel.push("reset", {})
+        .receive("ok", state_update)
+        .receive("error", resp => {
+            console.log("unable to reset", resp)
+        });
+}
+
 channel.join()
     .receive("ok", state_update)
     .receive("error", resp => {
         console.log("Unable to join", resp)
     })
-console.log("received from join")
 
-export default socket
+channel.on("view", state_update())

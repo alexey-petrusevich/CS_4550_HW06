@@ -3,16 +3,6 @@ import "milligram";
 import {hasGameEnded} from "./game";
 import {ch_push, ch_join, ch_reset} from "./socket";
 
-/*
-NOTE (regarding plagiarism):
-Lecture notes on React (4 and 5) were used in creating this assignment.
-Specifically:
-- Hooks via useState;
-- Event handlers (named the same or similarly);
-- file game.js, which contains helper functions;
-- notions of "guesses" similar to "guesses" in hangman;
- */
-
 // TODO: update the game such that it gets username and game name before
 // TODO: proceeding to the game
 // TODO: add button select - player or observer
