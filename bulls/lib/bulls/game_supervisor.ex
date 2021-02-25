@@ -1,4 +1,4 @@
-defmodule FourDigits.GameSup do
+defmodule FourDigits.GameSupervisor do
   use DynamicSupervisor
 
   def start_link(arg) do

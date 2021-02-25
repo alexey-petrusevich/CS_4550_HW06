@@ -15,8 +15,10 @@ defmodule Bulls.Application do
       BullsWeb.Endpoint,
       # Start a worker by calling: Bulls.Worker.start_link(arg)
       # {Bulls.Worker, arg}
+      # Start BackupAgent
       FourDigits.BackupAgent,
-
+      # Start GameSupervisor (DynamicSupervisor)
+      FourDigits.GameSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,19 +1,10 @@
 defmodule FourDigits.Game do
 
-  # returns new game?
-  #  def new() do
-  #    %{
-  #      guesses: [],
-  #      secret: generateSecret(),
-  #      hints: [],
-  #      status: ""
-  #    }
-  #  end
-
   # TODO: figure out where to put the global statistcs map??
   # TODO: maybe use backup agent???
 
-  def new do
+  # returns a new state of the game
+  def new() do
     %{
       playerGuesses: %{
         p1: [],
@@ -28,9 +19,14 @@ defmodule FourDigits.Game do
         p4: []
       },
       playerNames: [],
+      playerMap: %{ # this is used to map player names with p1-p4 (may not need this)
+        p1: "",
+        p2: "",
+        p3: "",
+        p4: ""
+      },
       gameName: "",
-      gameState: "", # set up, set up max (4 players joined),
-      # waiting for guesses, guesses submitted, gameWon, gameLost
+      gameState: :setUp, # :setUp :setUpMax :awaitingGuesses :guessesSubmitted :gameWon :gameLost
       secret: generateSecret()
     }
   end
@@ -40,7 +36,7 @@ defmodule FourDigits.Game do
   def playersReachedLimit(oldState, event) do
 
     # TODO: create new state from old state
-#    newState = Objects.copy(oldsState, {gameState: setUpMax})
+    #    newState = Objects.copy(oldsState, {gameState: setUpMax})
     newState
   end
 
