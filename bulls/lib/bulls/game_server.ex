@@ -53,9 +53,11 @@ defmodule FourDigits.GameServer do
   end
 
   # TODO may not need this
-#  def peek(gameName) do
-#    GenServer.call(reg(gameName), {:peek, gameName})
-#  end
+  # returns the state of the game given the name of the game
+  #
+  def peek(gameName) do
+    GenServer.call(reg(gameName), {:peek, gameName})
+  end
 
   # implementation
 
@@ -69,6 +71,7 @@ defmodule FourDigits.GameServer do
   # game -> state of the game
   def handle_call({:reset, gameName}, _from, game) do
     game = Game.new
+    # BackupAgent has already been started by this point
     BackupAgent.put(gameName, game)
     {:reply, game, game}
   end
@@ -77,21 +80,27 @@ defmodule FourDigits.GameServer do
   def handle_call({:guess, gameName, playerName, newGuess}, _from, game) do
     # modifies the game with the new guess
     game = Game.guess(game, playerName, newGuess)
+    # put modified game into the backup agent
     BackupAgent.put(gameName, game)
+    # reply to the caller with updated game state
     {:reply, game, game}
   end
 
+  # simply returns the state of the game at any moment
+  # for the callers
+  def handle_call({:peek, gameName}, _from, gameState) do
+    game = BackupAgent.get(gameName)
+    {:reply, game, game}
+  end
 
-#  def handle_call({:peek, _name}, _from, game) do
-#    {:reply, game, game}
-#  end
-#
-#  def handle_info(:pook, game) do
+  # this is used to broadcast to everyone on the channel the state of the game
+  def handle_info(:pook, game) do
+    # TODO ???
 #    game = Game.guess(game, "q")
-#    BullsWeb.Endpoint.broadcast!(
-#      "game:1", # FIXME: Game name should be in state
-#      "view",
-#      Game.view(game, ""))
-#    {:noreply, game}
-#  end
+    BullsWeb.Endpoint.broadcast!(
+      "game:1", # FIXME: Game name should be in state
+      "view",
+      Game.view(game, ""))
+    {:noreply, game}
+  end
 end

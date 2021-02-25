@@ -2,41 +2,51 @@ defmodule BullsWeb.GameChannel do
   use BullsWeb, :channel
 
   alias FourDigits.Game
-  alias FourDigits.BackupAgent
-
-  def getGame(name) do
-    game = BackupAgent.get(name)
-    if (game == nil) do
-      Game.new
-    else
-      game
-    end
-  end
+  alias FourDigits.GameServer
 
   @impl true
-  def join("game:" <> name, payload, socket) do
+  def join("game:" <> gameName, payload, socket) do
     if authorized?(payload) do
-      game = getGame(name)
+      # start game server (a.k.a. initialize new game when joined)
+      GameServer.start(gameName)
+      # create new socket, and assign game name and game state to the socket
       socket = socket
-               |> assign(:name, name)
-               |> assign(:game, game)
-      BackupAgent.put(name, game)
-      view = Game.view(game)
+               # store name of the game in the socket
+               |> assign(:gameName, gameName)
+      #               |> assign(:game, game)
+      # get state of the game from the server (process)
+      # here the game should be fresh - no guesses made
+      game = GameServer.peek(gameName)
+      # truncate any secret info and reveal only what is necessary
+      # to the caller
+      view = Game.view(game, "")
+      # return view back to the caller
       {:ok, view, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
   end
 
+  # given playerName, gameName, and newGuess, updates the state
+  # of the game and returns new state
   @impl true
-  def handle_in("guess", %{"player" => player, "guess" => guess}, socket) do
+  def handle_in(
+        "guess",
+        %{
+          "playerName" => playerName,
+          "guess" => newGuess
+        },
+        socket
+      ) do
 
-    game0 = socket.assigns[:game]
-    game1 = Game.makeGuess(game0, guess)
-    socket1 = assign(socket, :game, game1)
-    BackupAgent.put(socket.assigns[:name], game1)
-    view = Game.view(game1)
-    {:reply, {:ok, view}, socket1}
+    # retrieve saved game name from the socket
+    view = socket.assigns[:gameName]
+                  # make a new guess given playerName and newGuess
+                   |> GameServer.makeGuess(playerName, newGuess)
+                  # truncate state to what is viewed by the player (everyone?)
+                   |> Game.view()
+    broadcast(socket, "view", view)
+    {:reply, {:ok, view}, socket}
   end
 
 
