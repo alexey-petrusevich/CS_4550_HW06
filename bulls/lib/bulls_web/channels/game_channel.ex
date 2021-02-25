@@ -29,7 +29,8 @@ defmodule BullsWeb.GameChannel do
   end
 
   @impl true
-  def handle_in("guess", %{"guess" => guess}, socket) do
+  def handle_in("guess", %{"player" => player, "guess" => guess}, socket) do
+
     game0 = socket.assigns[:game]
     game1 = Game.makeGuess(game0, guess)
     socket1 = assign(socket, :game, game1)

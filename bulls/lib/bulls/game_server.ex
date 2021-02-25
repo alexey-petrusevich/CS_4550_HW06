@@ -1,3 +1,4 @@
+# represents a new game of bulls and cows
 defmodule FourDigits.GameServer do
   use GenServer
 
@@ -6,10 +7,12 @@ defmodule FourDigits.GameServer do
 
   # public interface
 
+
   def reg(name) do
     {:via, Registry, {FourDigits.GameReg, name}}
   end
 
+  # starts the game given the name of the game
   def start(name) do
     spec = %{
       id: __MODULE__,
@@ -17,7 +20,7 @@ defmodule FourDigits.GameServer do
       restart: :permanent,
       type: :worker
     }
-    FourDigits.GameSup.start_child(spec)
+    FourDigits.GameSupervisor.start_child(spec)
   end
 
   def start_link(name) do

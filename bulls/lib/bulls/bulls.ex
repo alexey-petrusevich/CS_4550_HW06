@@ -26,7 +26,7 @@ defmodule FourDigits.Game do
         p4: ""
       },
       gameName: "",
-      gameState: :setUp, # :setUp :setUpMax :awaitingGuesses :guessesSubmitted :gameWon :gameLost
+      gameState: :setUp, # :setUp :setUpMax :awaitingGuesses :guessesSubmitted :gameOver
       secret: generateSecret()
     }
   end
@@ -41,6 +41,7 @@ defmodule FourDigits.Game do
   end
 
   # replacement for FourDigits.js version of makeGuess
+  # %{p1: "1234"}
   def makeGuess(state, newGuess) do
     if (isValidInput(newGuess)) do
       cond do
