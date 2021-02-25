@@ -1,25 +1,27 @@
 import React, {useState, useEffect} from 'react'
 import "milligram";
 import {hasGameEnded} from "./game";
-import {ch_push, ch_join, ch_reset} from "./socket";
+import {ch_push, ch_join, ch_reset, ch_login} from "./socket";
 
 // TODO: update the game such that it gets username and game name before
 // TODO: proceeding to the game
 // TODO: add button select - player or observer
 
 function FourDigits() {
-    const [gameState, setGameState] = useState({
-        guesses: [],
-        hints: [],
-        status: ""
+    const [state, setState] = useState({
+        playerGuesses: {p1: [], p2: {}, p3: [], p4: []},
+        playerHints: {p1: [], p2: {}, p3: [], p4: []},
+        playerNames: [],
+        gameName: "",
+        gameState: ""
     });
     // for textfield
     const [guess, setGuess] = useState("");
 
-    let {guesses, hints, status} = gameState;
+    let {playerGuesses, playerHints, playerNames, gameName, gameState} = gameState;
 
     useEffect(() => {
-        ch_join(setGameState)
+        ch_join(setState)
     })
 
     /**
@@ -30,7 +32,6 @@ function FourDigits() {
      */
     function updateGuess(ev) {
         if (hasGameEnded(status)) {
-            console.log("update guess -> game ended")
             return;
         }
         let text = ev.target.value;

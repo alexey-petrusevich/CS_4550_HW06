@@ -37,9 +37,11 @@ defmodule FourDigits.Game do
 
   # TODO: implement state changes as pure functions (oldState, event) -> newState
 
-  def playersReachedLimit(oldState, event) do:
+  def playersReachedLimit(oldState, event) do
 
-    newState = Objects.copy(oldsState, {gameState: setUpMax})
+    # TODO: create new state from old state
+#    newState = Objects.copy(oldsState, {gameState: setUpMax})
+    newState
   end
 
   # replacement for FourDigits.js version of makeGuess
