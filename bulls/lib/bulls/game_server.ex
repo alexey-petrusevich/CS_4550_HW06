@@ -34,7 +34,7 @@ defmodule FourDigits.GameServer do
     # check if the game has been saved in the backup agent
     # the backup agent has already been started by the main thread
     # BackupAgent is shared between all the games
-    game = BackupAgent.get(gameName) || Game.new
+    game = BackupAgent.get(gameName) || Game.new(gameName)
     # start the server with the game state
     # if the server has failed somehow, it will restart
     # with the game retrieved from the BackupAgent
@@ -90,7 +90,7 @@ defmodule FourDigits.GameServer do
   # game -> state of the game
   def handle_call({:reset, gameName}, _from, gameState) do
     # create new game
-    game = Game.new
+    game = Game.new(gameName)
     # BackupAgent has already been started by this point
     # replace the game in the backup agent
     BackupAgent.put(gameName, game)

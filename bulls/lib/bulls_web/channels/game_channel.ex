@@ -19,16 +19,39 @@ defmodule BullsWeb.GameChannel do
     # here the game should be fresh - no guesses made
     # or the current game game
     gameState = GameServer.peek(gameName)
+    # truncate any secret info and reveal only what is necessary
+    # to the caller
+    view = Game.view(gameState)
+    # return view back to the caller
+    {:ok, view, socket}
+  end
+
+
+  @impl true
+  def handle_in("login", %{"gameName" => gameName}) do
+    view = socket.assigns[:gameName]
+           |> GameServer.peek()
+           |> Game.view()
+    {:reply, {:ok, view}, socket}
+  end
+
+  @impl true
+  def handle_in("join_as_observer", %{"gameName" => gameName}) do
+    view = socket.assigns[:gameName]
+           |> GameServer.peek()
+           |> Game.view()
+    {:reply, {:ok, view}, socket}
+  end
+
+  @impl true
+  def handle_in("join_as_player", %{"playerName" => playerName, "gameName" => gameName}) do
+    # TODO implement
     # update the game with new user and change the state if necessary
     # this also covers the case when the game is in :playing state
     if (!Game.isGameFull(gameState)) do
       # update the game with new player
       gameState = Game.updateJoin(gameState, playerName)
-      # truncate any secret info and reveal only what is necessary
-      # to the caller
-      view = Game.view(game)
-      # return view back to the caller
-      {:ok, view, socket}
+
     else
       # else game is full, just return view
       # truncate any secret info and reveal only what is necessary

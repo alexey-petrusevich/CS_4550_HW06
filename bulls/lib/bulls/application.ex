@@ -17,8 +17,6 @@ defmodule Bulls.Application do
       # {Bulls.Worker, arg}
       # Start BackupAgent
       FourDigits.BackupAgent,
-      # TODO add another backup agent for keeping game statistics
-      FourDigits.BackupAgentWinsLosses,
       # Start GameSupervisor (DynamicSupervisor)
       FourDigits.GameSupervisor
     ]

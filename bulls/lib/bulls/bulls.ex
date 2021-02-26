@@ -2,7 +2,7 @@ defmodule FourDigits.Game do
 
 
   # returns a new state of the game
-  def new() do
+  def new(gameName) do
     %{
       playerGuesses: %{
         p1: [],
@@ -45,6 +45,7 @@ defmodule FourDigits.Game do
       wins: %{}, # keeps track of all the players' wins
       losses: %{}, # keeps track of all the players' losses
       gameState: :setUp, # :setUp :gameFull :playing :gameOver
+      gameName: gameName,
       status: "",
       secret: generateSecret()
     }
@@ -513,6 +514,7 @@ defmodule FourDigits.Game do
       playerNames: state.playerNames,
       winners: state.winners,
       gameState: state.gameState,
+      gameName: state.gameName,
       status: state.status
     }
   end
