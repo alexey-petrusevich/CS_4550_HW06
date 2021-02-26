@@ -49,7 +49,6 @@ defmodule FourDigits.GameServer do
   end
 
   # this is client side functions
-  # reg(name) returns PID
 
   # resets the game state
   # here reg(name) gets the game from the registry
@@ -76,9 +75,9 @@ defmodule FourDigits.GameServer do
 
   # star_link calls this method with gameState
   def init(game) do
-    # TODO: do we need this :pook here?
-    # calls :pook every 10 seconds?
-    #Process.send_after(self(), :pook, 30_000)
+    # calls :pook every 30 seconds
+    # :pook will append any guesses and check for the winners
+    Process.send_after(self(), :pook, 30_000)
     {:ok, game} # this is returned if start_link was successful
   end
 
@@ -119,15 +118,14 @@ defmodule FourDigits.GameServer do
   # TODO to the list of guesses of that specific player
   # TODO: if the game is won, reset the game, and change the state from gameOver
   # TODO: modify the game such that the guesses are not being sent back until this function is being called
-  def handle_info(:pook, game) do
-    # TODO ???
+  def handle_info(:pook, gameState) do
     #    game = Game.guess(game, "q")
     BullsWeb.Endpoint.broadcast!(
       "game:1",
       # FIXME: Game name should be in state
       "view",
-      Game.view(game)
+      Game.view(gameState)
     )
-    {:noreply, game}
+    {:noreply, gameState}
   end
 end

@@ -19,7 +19,6 @@ defmodule BullsWeb.GameChannel do
       game = GameServer.peek(gameName)
       # truncate any secret info and reveal only what is necessary
       # to the caller
-      # TODO: may need to pass username as well (if different users see different state)
       view = Game.view(game)
       # return view back to the caller
       {:ok, view, socket}
