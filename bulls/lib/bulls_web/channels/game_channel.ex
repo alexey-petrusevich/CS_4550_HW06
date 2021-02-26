@@ -4,6 +4,7 @@ defmodule BullsWeb.GameChannel do
   alias FourDigits.Game
   alias FourDigits.GameServer
 
+  # this method is called when a new game is created
   @impl true
   def join("game:" <> gameName, payload, socket) do
     if authorized?(payload) do
@@ -13,13 +14,13 @@ defmodule BullsWeb.GameChannel do
       socket = socket
                # store name of the game in the socket
                |> assign(:gameName, gameName)
-      #               |> assign(:game, game)
       # get state of the game from the server (process)
       # here the game should be fresh - no guesses made
       game = GameServer.peek(gameName)
       # truncate any secret info and reveal only what is necessary
       # to the caller
-      view = Game.view(game, "")
+      # TODO: may need to pass username as well (if different users see different state)
+      view = Game.view(game)
       # return view back to the caller
       {:ok, view, socket}
     else
@@ -41,20 +42,28 @@ defmodule BullsWeb.GameChannel do
 
     # retrieve saved game name from the socket
     view = socket.assigns[:gameName]
-                  # make a new guess given playerName and newGuess
-                   |> GameServer.makeGuess(playerName, newGuess)
-                  # truncate state to what is viewed by the player (everyone?)
-                   |> Game.view()
+           # make a new guess given playerName and newGuess
+           |> GameServer.makeGuess(playerName, newGuess)
+      # truncate state to what is viewed by the player (everyone?)
+           |> Game.view()
+    # broadcast the view to everyone connected to the socket
     broadcast(socket, "view", view)
+    # send a reply with the view to the caller
     {:reply, {:ok, view}, socket}
   end
 
 
+  # this endpoint listens to "reset" messages
   @impl true
   def handle_in("reset", _, socket) do
-    game = Game.new
-    socket = assign(socket, :game, game)
-    view = Game.view(game)
+    #    user = socket.assigns[:user]
+    view = socket.assigns[:gameName] # get name of the game and pass it to the reset
+           # game server will use the saved name to find the name in the Registry
+           |> GameServer.reset() # reset the game and get fresh game state
+           |> Game.view() # truncate all secrets by passing fresh state to the view() method
+    # broadcast new view to everyone connected to this socket
+    broadcast(socket, "view", view)
+    # send a reply back to the caller
     {:reply, {:ok, view}, socket}
   end
 

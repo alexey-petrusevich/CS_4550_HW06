@@ -10,15 +10,16 @@ defmodule FourDigits.GameServer do
   # Registry here automatically started by DynamicSupervisor (GameSupervisor)
   # return format {:via, Registry, {FourDigits.GameReg, gameName}}
   # this tuple is then used by GenServer.call/2 instead of PID
-  def reg(name) do
-    {:via, Registry, {FourDigits.GameReg, name}}
+  # to retrieve info from the registry
+  def reg(gameName) do
+    {:via, Registry, {FourDigits.GameReg, gameName}}
   end
 
   # starts the game given the name of the game
-  def start(name) do
+  def start(gameName) do
     spec = %{
       id: __MODULE__, # name of the child
-      start: {__MODULE__, :start_link, [name]},
+      start: {__MODULE__, :start_link, [gameName]},
       restart: :permanent,
       type: :worker
     }
@@ -29,12 +30,21 @@ defmodule FourDigits.GameServer do
   end
 
   # starts this process (GenServer)
-  def start_link(name) do
-    game = BackupAgent.get(name) || Game.new
+  def start_link(gameName) do
+    # check if the game has been saved in the backup agent
+    # the backup agent has already been started by the main thread
+    # BackupAgent is shared between all the games
+    game = BackupAgent.get(gameName) || Game.new
+    # start the server with the game state
+    # if the server has failed somehow, it will restart
+    # with the game retrieved from the BackupAgent
     GenServer.start_link(
-      __MODULE__, # module name
-      game, # any, which is state here
-      name: reg(name) # options
+      __MODULE__,
+      # module name
+      game,
+      # any, which is state here
+      name: reg(gameName)
+      # options
     )
   end
 
@@ -43,43 +53,52 @@ defmodule FourDigits.GameServer do
 
   # resets the game state
   # here reg(name) gets the game from the registry
+  # this is a wrapper method for GenServer.call -> :reset
+  # actual listener is below
   def reset(gameName) do
     GenServer.call(reg(gameName), {:reset, gameName})
   end
 
   # makes a new guess given game name, player name, and a guess
-  def guess(gameName, playerName, newGuess) do
-    GenServer.call(reg(gameName), {:guess, gameName, playerName, newGuess})
+  # this is a wrapper method for GenServer.call -> :makeGuess
+  # actual listener is below
+  def makeGuess(gameName, playerName, newGuess) do
+    GenServer.call(reg(gameName), {:makeGuess, gameName, playerName, newGuess})
   end
 
-  # TODO may not need this
+
   # returns the state of the game given the name of the game
-  #
+  # this is a wrapper method for GenServer.call -> :peek
+  # actual listener is below
   def peek(gameName) do
     GenServer.call(reg(gameName), {:peek, gameName})
   end
 
-  # implementation
-
+  # star_link calls this method with gameState
   def init(game) do
+    # TODO: do we need this :pook here?
+    # calls :pook every 10 seconds?
     #Process.send_after(self(), :pook, 10_000)
-    {:ok, game}
+    {:ok, game} # this is returned if start_link was successful
   end
 
   # here game is retrieved from the registry
   # from is info about the caller
   # game -> state of the game
   def handle_call({:reset, gameName}, _from, game) do
+    # create new game
     game = Game.new
     # BackupAgent has already been started by this point
+    # replace the game in the backup agent
     BackupAgent.put(gameName, game)
+    # send a reply back to the caller with the new game state
     {:reply, game, game}
   end
 
   # handles guess calls from GenServer.call
-  def handle_call({:guess, gameName, playerName, newGuess}, _from, game) do
+  def handle_call({:makeGuess, gameName, playerName, newGuess}, _from, game) do
     # modifies the game with the new guess
-    game = Game.guess(game, playerName, newGuess)
+    game = Game.makeGuess(game, playerName, newGuess)
     # put modified game into the backup agent
     BackupAgent.put(gameName, game)
     # reply to the caller with updated game state
@@ -89,18 +108,22 @@ defmodule FourDigits.GameServer do
   # simply returns the state of the game at any moment
   # for the callers
   def handle_call({:peek, gameName}, _from, gameState) do
+    # get the game state from the backup agent
     game = BackupAgent.get(gameName)
+    # return the game state to the caller
     {:reply, game, game}
   end
 
   # this is used to broadcast to everyone on the channel the state of the game
   def handle_info(:pook, game) do
     # TODO ???
-#    game = Game.guess(game, "q")
+    #    game = Game.guess(game, "q")
     BullsWeb.Endpoint.broadcast!(
-      "game:1", # FIXME: Game name should be in state
+      "game:1",
+      # FIXME: Game name should be in state
       "view",
-      Game.view(game, ""))
+      Game.view(game)
+    )
     {:noreply, game}
   end
 end

@@ -42,16 +42,16 @@ defmodule FourDigits.Game do
 
   # replacement for FourDigits.js version of makeGuess
   # %{p1: "1234"}
-  def makeGuess(state, newGuess) do
+  def makeGuess(gameState, playerName, newGuess) do
     if (isValidInput(newGuess)) do
       cond do
-        hasGameWon(state.guesses, state.secret, newGuess) ->
-          %{state | status: "You won!"}
-        hasGameLost(state.guesses) ->
-          %{state | status: "You lost!"}
+        hasGameWon(gameState.guesses, gameState.secret, newGuess) ->
+          %{gameState | status: "You won!"}
+        hasGameLost(gameState.guesses) ->
+          %{gameState | status: "You lost!"}
         true ->
-          newHint = getHint(state.secret, newGuess)
-          state = %{state | hints: state.hints ++ [newHint]}
+          newHint = getHint(gameState.secret, newGuess)
+          state = %{gameState | hints: gameState.hints ++ [newHint]}
           state = %{state | guesses: state.guesses ++ [newGuess]}
           if (String.length(state.status) > 0) do
             %{state | status: ""}
@@ -60,7 +60,8 @@ defmodule FourDigits.Game do
           end
       end
     else
-      %{state | status: "A guess must be a 4-digit unique integer (1-9)"}
+    #
+      %{gameState | status: "A guess must be a 4-digit unique integer (1-9)"}
     end
   end
 
