@@ -32,7 +32,8 @@ defmodule FourDigits.Game do
         p3: false,
         p4: false
       },
-      gameState: :setUp, # :setUp :setUpMax :awaitingGuesses :guessesSubmitted :gameOver
+      gameState: :setUp, # :setUp :playing :gameOver
+      status: "Winner: {list of winners}",
       secret: generateSecret()
     }
   end

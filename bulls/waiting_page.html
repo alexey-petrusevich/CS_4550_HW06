@@ -1,49 +1,50 @@
 <!DOCTYPE html>
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
-  </head>
+<head>
+    <meta charset="utf-8"/>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+</head>
 
-  <body>
-    <div class="container" style="text-align:center">
-      <h1>Bulls and Cows</h1>
-      <h2>Waiting on Players</h2>
-      <table>
+<body>
+<div class="container" style="text-align:center">
+    <h1>Bulls and Cows</h1>
+    <h2>Waiting on Players</h2>
+    <table>
         <tr>
-          <th>Player<th>
-          <th>Name<th>
-          <th>Ready?<th>
+            <th>Player</th>
+            <th>Name</th>
+            <th>Ready?</th>
         </tr>
         <tr>
-          <th>1<th>
-          <th>{players[0]}<th>
-          <th>{ready[0]}<th>
+            <th>1</th>
+            <th>{players[0]}</th>
+            <th>{ready[0]}</th>
         </tr>
         <tr>
-          <th>2<th>
-          <th>{players[1]}<th>
-          <th>{ready[1]}<th>
+            <th>2</th>
+            <th>{players[1]}</th>
+            <th>{ready[1]}</th>
         </tr>
         <tr>
-          <th>3<th>
-          <th>{players[2]}<th>
-          <th>{ready[2]}<th>
+            <th>3</th>
+            <th>{players[2]}</th>
+            <th>{ready[2]}</th>
         </tr>
         <tr>
-          <th>4<th>
-          <th>{players[3]}<th>
-          <th>{ready[3]}<th>
+            <th>4</th>
+            <th>{players[3]}</th>
+            <th>{ready[3]}</th>
         </tr>
-      </table>
-      <input
-             type="submit"
-             onClick={player_ready}
-             value="Ready"
-             disabled={not_sure_what_to_do_here}
-      />
-    </div>
-  </body>
+    </table>
+    <input
+            type="submit"
+            onClick={player_ready}
+            value="Ready"
+            disabled={not_sure_what_to_do_here}
+    />
+</div>
+</body>
 </html>

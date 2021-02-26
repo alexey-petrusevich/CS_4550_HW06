@@ -67,6 +67,9 @@ defmodule BullsWeb.GameChannel do
     {:reply, {:ok, view}, socket}
   end
 
+  # TODO: add endpoint for returning wins and losses to the caller
+  # TODO: games and losses should be for ALL the games
+
 
   # Channels can be used in a request/response fashion
   # by sending replies to requests from the client

@@ -78,7 +78,7 @@ defmodule FourDigits.GameServer do
   def init(game) do
     # TODO: do we need this :pook here?
     # calls :pook every 10 seconds?
-    #Process.send_after(self(), :pook, 10_000)
+    #Process.send_after(self(), :pook, 30_000)
     {:ok, game} # this is returned if start_link was successful
   end
 
@@ -115,6 +115,10 @@ defmodule FourDigits.GameServer do
   end
 
   # this is used to broadcast to everyone on the channel the state of the game
+  # TODO: for every turn a player has not submitted a guess, add an empty string (pass)
+  # TODO to the list of guesses of that specific player
+  # TODO: if the game is won, reset the game, and change the state from gameOver
+  # TODO: modify the game such that the guesses are not being sent back until this function is being called
   def handle_info(:pook, game) do
     # TODO ???
     #    game = Game.guess(game, "q")

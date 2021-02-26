@@ -56,6 +56,9 @@ export function ch_reset() {
         });
 }
 
+// TODO: add endpoint for returning wins and losses to the caller
+// TODO: like ch_get_wins_losses????
+
 channel.join()
     .receive("ok", state_update)
     .receive("error", resp => {

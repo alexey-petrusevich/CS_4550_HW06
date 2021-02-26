@@ -19,6 +19,13 @@ function FourDigits() {
     // for textfield
     const [guess, setGuess] = useState("");
 
+
+    // TODO: add exit button to playing screen
+    // TODO (NOTE): if a player leaves the game at any moment, he is considered AFK and the game
+    // TODO (NOTE): as if the player is still in the game but subimts passes
+    // TODO: add reset button on the playing page
+    // TODO: add wins/losses statistics to the setup page
+
     let {playerGuesses, playerHints, playerNames, gameName, gameState} = gameState;
 
     useEffect(() => {
@@ -223,7 +230,7 @@ function FourDigits() {
         //    TODO: implement and add another useState hook
     }
 
-    function Login({userName, gameName}) {
+    function Login() {
         return (
             <div>
                 <div className="container">
@@ -260,7 +267,19 @@ function FourDigits() {
     }
 
 
-    function Login({userName, gameName}) {
+    function update_guess() {
+        // TODO: implement
+    }
+
+    function game_over() {
+        // TODO: implement
+    }
+
+    function submit_pass() {
+        // TODO: implement
+    }
+
+    function PlayingPage({players, guesses, results}) {
         return (
             <div>
                 <div className="container" style="text-align:center">
@@ -268,58 +287,34 @@ function FourDigits() {
                     <h2>GO! Timer: (https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>
                     <table>
                         <tr>
-                            <th>{players[0]}
-                                <th>
-                                    <th>
-                                        <th>
-                                            <th>{players[1]}
-                                                <th>
-                                                    <th>
-                                                        <th>
-                                                            <th>{players[2]}
-                                                                <th>
-                                                                    <th>
-                                                                        <th>
-                                                                            <th>{players[3]}
-                                                                                <th>
-                                                                                    <th>
-                                                                                        <th>
+                            <th>{players[0]}</th>
+                            <th/>
+                            <th>{players[1]}</th>
+                            <th/>
+                            <th>{players[2]}</th>
+                            <th/>
+                            <th>{players[3]}</th>
+                            <th/>
                         </tr>
                         <tr>
-                            <th>Guess:
-                                <th>
-                                    <th>Hint:
-                                        <th>
-                                            <th>Guess:
-                                                <th>
-                                                    <th>Hint:
-                                                        <th>
-                                                            <th>Guess:
-                                                                <th>
-                                                                    <th>Hint:
-                                                                        <th>
-                                                                            <th>Guess:
-                                                                                <th>
-                                                                                    <th>Hint:
-                                                                                        <th>
+                            <th>Guess:</th>
+                            <th>Hint:</th>
+                            <th>Guess:</th>
+                            <th>Hint:</th>
+                            <th>Guess:</th>
+                            <th>Hint:</th>
+                            <th>Guess:</th>
+                            <th>Hint:</th>
                         </tr>
                         <tr>
-                            <td>{guesses[0][i]}
-                                <td>
-                                    <td>{results[0][i]}
-                                        <td>
-                                            <td>{guesses[1][i]}
-                                                <td>
-                                                    <td>{results[1][i]}
-                                                        <td>
-                                                            <td>{guesses[2][i]}
-                                                                <td>
-                                                                    <td>{results[2][i]}
-                                                                        <td>
-                                                                            <td>{guesses[3][i]}
-                                                                                <td>
-                                                                                    <td>{results[3][i]}
-                                                                                        <td>
+                            <td>{guesses[0][i]}</td>
+                            <td>{results[0][i]}</td>
+                            <td>{guesses[1][i]}</td>
+                            <td>{results[1][i]}</td>
+                            <td>{guesses[2][i]}</td>
+                            <td>{results[2][i]}</td>
+                            <td>{guesses[3][i]}</td>
+                            <td>{results[3][i]}</td>
                         </tr>
                     </table>
                     <input
@@ -332,7 +327,7 @@ function FourDigits() {
                     />
                     <input
                         type="submit"
-                        onClick={submit_guess}
+                        onClick=makeGuess
                         value="Submit Guess"
                         disabled={game_over}
                     />
@@ -344,33 +339,83 @@ function FourDigits() {
                     />
                 </div>
             </div>
-    );
+        );
     }
 
 
+    function player_ready() {
+        // TODO: implement
+    }
 
-    function StatusBar(
-        {
-            status
-        }
-    )
-        {
-            return (
-                <div className="status">
-                    <div className="row">
-                        <div className="column">
-                            <p>
-                                {status}
-                            </p>
-                        </div>
+    function not_sure_what_to_do_here() {
+        // TODO: implement
+    }
+
+
+    function WaitingPage({players, ready}) {
+        return (
+            <div>
+                <div className="container" style="text-align:center">
+                    <h1>Bulls and Cows</h1>
+                    <h2>Waiting on Players</h2>
+                    <table>
+                        <tr>
+                            <th>Player</th>
+                            <th>Name</th>
+                            <th>Ready?</th>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <th>{players[0]}</th>
+                            <th>{ready[0]}</th>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <th>{players[1]}</th>
+                            <th>{ready[1]}</th>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <th>{players[2]}</th>
+                            <th>{ready[2]}</th>
+                        </tr>
+                        <tr>
+                            <th>4</th>
+                            <th>{players[3]}</th>
+                            <th>{ready[3]}</th>
+                        </tr>
+                    </table>
+                    <input
+                        type="submit"
+                        onClick={player_ready}
+                        value="Ready"
+                        disabled={not_sure_what_to_do_here}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+
+    function StatusBar({status}) {
+        return (
+            <div className="status">
+                <div className="row">
+                    <div className="column">
+                        <p>
+                            {status}
+                        </p>
                     </div>
                 </div>
-            );
-        }
-
+            </div>
+        );
     }
 
 
-    export default FourDigits;
+
+}
+
+
+export default FourDigits;
 
 
