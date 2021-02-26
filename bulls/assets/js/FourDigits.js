@@ -12,12 +12,17 @@ function FourDigits() {
         playerGuesses: {p1: [], p2: [], p3: [], p4: []},
         playerHints: {p1: [], p2: [], p3: [], p4: []},
         playerNames: [],
-        winner: {},
+        winners: {},
+        wins: {},
+        losses: {},
         gameState: "",
         status: ""
     });
     // for textfield
     const [guess, setGuess] = useState("");
+    const [gameName, setGameName] = useState("");
+    export default gameName;
+    const [playerName, setPlayerName] = useState("");
 
 
     // TODO: add exit button to playing screen
@@ -32,92 +37,96 @@ function FourDigits() {
         ch_join(setState)
     })
 
-    /**
-     * Event handler for handling change of the text field
-     * containing player's guess.
-     *
-     * @param ev event being invoked by the caller
-     */
-    function updateGuess(ev) {
-        if (hasGameEnded(status)) {
-            return;
-        }
-        let text = ev.target.value;
-        let fieldLength = text.length;
-        if (fieldLength > 4) {
-            text = text.substr(0, 4);
-        }
-        setGuess(text);
+
+
+
+    // FUNCTIONS THAT DIRECTLY UPDATE STATE
+
+    // updates the guess state
+    function update_guess(input) {
+      setGuess(input.target.value)
+    }
+
+    // updates the playerName state
+    function update_playername(input) {
+      setPlayerName(input.target.value)
+    }
+
+    // updates the gameName state
+    function update_gamename(input) {
+      setGameName(input.target.value)
     }
 
 
-    /**
-     * Being called when a user makes a guess by pressing a "guess"
-     * button or presses "Enter" key when the guess text field
-     * is focused.
-     * Makes a guess if the game hasn't ended.
-     */
-    function makeGuess() {
-        ch_push({guess: guess});
+
+    // FUNCTIONS THAT COMMUNICATE CHANGES TO THE CHANNEL
+
+    function join_game() {
+            ch_login({playerName: playerName, gameName: gameName})
+        }
+
+    // calls ch_push to make guess
+    function make_guess() {
+        ch_push({playerName: playerName, guess: guess});
     }
 
-
-    /**
-     * Event handler for key presses when the guess text field
-     * is focused.
-     *
-     * @param ev the event invoked by the caller (key press)
-     */
-    function keypress(ev) {
-        if (hasGameEnded(status)) {
-            console.log("game ended");
-            return;
-        }
-        if (ev.key === "Enter") {
-            console.log("enter pressed");
-            makeGuess();
-        }
-        console.log("key pressed: " + ev.key);
-    }
-
-
-    /**
-     * Resets the game by clearing all the sates.
-     */
+    // resets the game or something
     function reset() {
         console.log("game reset");
         ch_reset();
     }
 
-    return (
-        <div>
-            <div className="controls">
-                <div className="row">
-                    <div className="column">
-                        <p>
-                            <input type="text"
-                                   onChange={updateGuess}
-                                   value={guess}
-                                   onKeyPress={keypress}
-                            />
-                        </p>
-                    </div>
-                    <div className="column">
-                        <p>
-                            <button onClick={makeGuess}>Guess</button>
-                            <button onClick={reset}>Reset</button>
-                        </p>
+
+
+    // FUNCTIONS RELATED TO LOGIN PAGE
+
+    // returns the login page html
+    function LoginPage() {
+            return (
+                <div>
+                    <div className="container">
+                        <h1 style="text-align:center">Bulls and Cows</h1>
+                        <h2 style="text-align:center">Multiplayer Login</h2>
+                        <form>
+                            <fieldset>
+                                <label>Game ID</label>
+                                <input
+                                    type="text"
+                                    id="sourceText"
+                                    placeholder="roomtown123"
+                                    onChange={update_gamename}
+                                    required
+                                />
+                                <label>User ID</label>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    placeholder="coolguy456"
+                                    onChange={update_username}
+                                    required
+                                />
+                                <input
+                                    type="submit"
+                                    onClick={join_game}
+                                    value="Join Game"
+                                />
+                            </fieldset>
+                        </form>
                     </div>
                 </div>
-            </div>
+            );
+        }
 
-            <ResultTable guesses={guesses} hints={hints}/>
 
-            <StatusBar status={status}/>
+    // FUNCTIONS RELATED TO JOIN AS PAGE
 
-        </div>
-    );
 
+
+    // FUNCTIONS RELATED TO SETUP PAGE
+
+
+
+    // FUNCTIONS RELATED TO PLAYING PAGE
 
     /**
      * Returns a grid containing information about past guesses.
@@ -218,59 +227,6 @@ function FourDigits() {
         );
     }
 
-    function join_game() {
-        //    TODO: implement
-    }
-
-    function update_gamename() {
-        //    TODO: implement and add another useState hook
-    }
-
-    function update_username() {
-        //    TODO: implement and add another useState hook
-    }
-
-    function Login() {
-        return (
-            <div>
-                <div className="container">
-                    <h1 style="text-align:center">Bulls and Cows</h1>
-                    <h2 style="text-align:center">Multiplayer Login</h2>
-                    <form>
-                        <fieldset>
-                            <label>Game ID</label>
-                            <input
-                                type="text"
-                                id="sourceText"
-                                placeholder="roomtown123"
-                                onChange={update_gamename}
-                                required
-                            />
-                            <label>User ID</label>
-                            <input
-                                type="text"
-                                id="username"
-                                placeholder="coolguy456"
-                                onChange={update_username}
-                                required
-                            />
-                            <input
-                                type="submit"
-                                onClick={join_game}
-                                value="Join Game"
-                            />
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-        );
-    }
-
-
-    function update_guess() {
-        // TODO: implement
-    }
-
     function game_over() {
         // TODO: implement
     }
@@ -327,7 +283,7 @@ function FourDigits() {
                     />
                     <input
                         type="submit"
-                        onClick=makeGuess
+                        onClick={make_guess}
                         value="Submit Guess"
                         disabled={game_over}
                     />
@@ -417,5 +373,3 @@ function FourDigits() {
 
 
 export default FourDigits;
-
-

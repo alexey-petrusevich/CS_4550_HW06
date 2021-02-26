@@ -1,4 +1,5 @@
 import {Socket} from "phoenix";
+import gameName from './FourDigits'
 
 let socket = new Socket(
     "/socket",
@@ -6,7 +7,8 @@ let socket = new Socket(
 );
 socket.connect()
 
-let channel = socket.channel("game:1", {})
+let gameVal = "game:" + gameName;
+let channel = socket.channel(gameVal, {})
 
 let state = {
     playerGuesses: {p1: [], p2: {}, p3: [], p4: []},
@@ -31,17 +33,32 @@ export function ch_join(cb) {
     callback(state)
 }
 
-export function ch_login(playerName, gameName) {
-    channel.push("login", {playerName: playerName, gameName: gameName})
+export function ch_login(gameName) {
+    channel.push("login", {gameName: gameName})
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to login", resp)
         });
 }
 
-export function ch_push(guess) {
-    // TODO: add player name
-    channel.push("guess", guess)
+export function ch_join_as_observer(gameName) {
+    channel.push("ch_join_as_observer", {gameName: gameName})
+        .receive("ok", state_update)
+        .receive("error", resp => {
+            console.log("unable to login", resp)
+        });
+}
+
+export function ch_join_as_player(playerName, gameName) {
+    channel.push("join_as_player", {playerName: playerName, gameName: gameName})
+        .receive("ok", state_update)
+        .receive("error", resp => {
+            console.log("unable to login", resp)
+        });
+}
+
+export function ch_push(guess, playerName) {
+    channel.push("guess", {playerName: playerName, guess: guess})
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to push", resp)
