@@ -34,7 +34,7 @@ defmodule FourDigits.GameServer do
     # check if the game has been saved in the backup agent
     # the backup agent has already been started by the main thread
     # BackupAgent is shared between all the games
-    game = BackupAgent.get(gameName) || Game.new
+    game = BackupAgent.get(gameName) || Game.new(gameName)
     # start the server with the game state
     # if the server has failed somehow, it will restart
     # with the game retrieved from the BackupAgent
@@ -49,7 +49,6 @@ defmodule FourDigits.GameServer do
   end
 
   # this is client side functions
-  # reg(name) returns PID
 
   # resets the game state
   # here reg(name) gets the game from the registry
@@ -66,6 +65,10 @@ defmodule FourDigits.GameServer do
     GenServer.call(reg(gameName), {:makeGuess, gameName, playerName, newGuess})
   end
 
+  def playerReady(gameName, playerName) do
+    GenServer.call(reg(gameName), {:ready, playerName})
+  end
+
 
   # returns the state of the game given the name of the game
   # this is a wrapper method for GenServer.call -> :peek
@@ -76,18 +79,18 @@ defmodule FourDigits.GameServer do
 
   # star_link calls this method with gameState
   def init(game) do
-    # TODO: do we need this :pook here?
-    # calls :pook every 10 seconds?
-    #Process.send_after(self(), :pook, 30_000)
+    # calls :pook every 30 seconds
+    # :pook will append any guesses and check for the winners
+    Process.send_after(self(), :pook, 30_000)
     {:ok, game} # this is returned if start_link was successful
   end
 
   # here game is retrieved from the registry
   # from is info about the caller
   # game -> state of the game
-  def handle_call({:reset, gameName}, _from, game) do
+  def handle_call({:reset, gameName}, _from, gameState) do
     # create new game
-    game = Game.new
+    game = Game.new(gameName)
     # BackupAgent has already been started by this point
     # replace the game in the backup agent
     BackupAgent.put(gameName, game)
@@ -105,6 +108,12 @@ defmodule FourDigits.GameServer do
     {:reply, game, game}
   end
 
+  def handle_call({:ready, gameName, playerName}, _from, gameState) do
+    game = Game.toggleReady(gameState, playerName)
+    BackupAgent.put(gameName, game)
+    {:reply, game, game}
+  end
+
   # simply returns the state of the game at any moment
   # for the callers
   def handle_call({:peek, gameName}, _from, gameState) do
@@ -119,15 +128,15 @@ defmodule FourDigits.GameServer do
   # TODO to the list of guesses of that specific player
   # TODO: if the game is won, reset the game, and change the state from gameOver
   # TODO: modify the game such that the guesses are not being sent back until this function is being called
-  def handle_info(:pook, game) do
-    # TODO ???
-    #    game = Game.guess(game, "q")
+  def handle_info(:pook, gameState) do
+    # update
+    gameName = gameState.gameName
     BullsWeb.Endpoint.broadcast!(
-      "game:1",
+      "game:{gameName}",
       # FIXME: Game name should be in state
       "view",
-      Game.view(game)
+      Game.view(gameState)
     )
-    {:noreply, game}
+    {:noreply, gameState}
   end
 end
