@@ -53,27 +53,135 @@ defmodule FourDigits.Game do
 
   # updates given game state with a new user joins
   def updateJoin(gameState, playerName) do
-    if (gameState.gameState)
+    if (gameState.gameState == :playing
+        || isGameFull(gameState)) do
+      # game in progress or full - no update
+      gameState
+    else
+      # else add new player
+      # add player to the list of playerNames
+      playerNames = gameState.playerNames ++ [playerName]
+      newState = %{gameState | playerNames: playerNames}
+      # add player to the playerMap
+      newState = addToPlayerMap(newState, playerName)
+      # add player to wins and losses (if not present)
+      newState = addToWinsLosses(newState, playerName)
+      # check if the game is full
+      if (isGameFull(newState)) do
+        # game is full, update game state
+        %{newState | gameState: :gameFull}
+      else
+        # else game is not full - do not update gameState
+        newState
+      end
+    end
   end
 
+  # adds new player to the wins and losses maps
+  # if player is already there, returns original gameState
+  # assumes that both or neither wins and losses have the player
+  def addToWinsLosses(gameState, playerName) do
+    # get player atom (key) given playerName
+    player = getPlayerAtom(gameState, playerName)
+    wins = gameState.wins
+    losses = gameState.losses
+    if (Map.get(wins, player) == nil) do
+      # add new entry
+      wins = Map.put(wins, playerName, 0)
+      losses = Map.put(losses, playerName, 0)
+      newSate = %{gameState | wins: wins}
+      newState = %{newState | losses: losses}
+      newState
+    else
+      # else return original game state
+      gameState
+    end
+  end
+
+
+  # adds a given playerName to the playerMap
+  def addToPlayerMap(gameState, playerName) do
+    # get player atom (key) given playerName
+    player = getPlayerAtom(gameState, playerName)
+    keys = Map.keys(gameState.playerMap)
+    addToPlayerMapHelper(gameState, playerName, keys)
+  end
+
+  #
+  def addToPlayerMapHelper(gameState, playerName, keys) do
+    if (length(keys) == 0) do
+      # end of list - player cannot be added
+      raise "Error: trying to add player to the full game (addPlayerMap)"
+    else
+      if (Map.get(gameState.playerMap, hd(keys)) == nil) do
+        # found empty spot - add playerName
+        newPlayerMap = Map.put(gameState.playerMap, hd(keys), playerName)
+        %{gameState | playerMap: newPlayerMap}
+      else
+        # else check next spot
+        addToPlayerMapHelper(gameState, playerName, tl(keys))
+      end
+    end
+  end
+
+
+  # returns the game state when the given player
+  # marks himself as ready
   def toggleReady(gameState, playerName) do
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
-    if (player == nil) do
-      # player not found - do nothing
+    if (player == nil
+        || isGameOver(gameState)
+        || isGameInProgress(gameState)) do
+      # do nothing if either player not found, game over,
+      # or game is progress
       gameState
     else
       # else update players ready
       playersReady = %{gameState.playersReady | player: true}
       # update game state with new players ready
-      %{gameState | playersReady: playersReady}
+      newState = %{gameState | playersReady: playersReady}
+      # check if state change is required
+      if (isAllReady(newState, newState.playerNames)) do
+        # change the game state to ready
+        %{newState | gameState: :playing}
+      else
+        # at least one player is not ready
+        newState
+      end
     end
   end
 
   # return true if the game is full (e.g. the number
   # of players has reached 4
   def isGameFull(gameState) do
-    length(gameState.playerName) >= 4
+    length(gameState.playerNames) >= 4
+  end
+
+  # returns true if the given gameState is in the :gameOver state
+  def isGameOver(gameState) do
+    gameState.gameState == :gameOver
+  end
+
+  # returns true if all players are ready
+  def isAllReady(gameState, playerNames) do
+    if (length(playerNames) == 0) do
+      true
+    else
+      isPlayerReady(gameState, hd(playerNames))
+      && isAllReady(gameState, tl(playerNames))
+    end
+  end
+
+  # returns true if given player is ready
+  # assumes that playerName is in the list (map) of players
+  def isPlayerReady(gameState, playerName) do
+    player = getPlayerAtom(gameState, playerName)
+    Map.get(gameState.playersReady, player)
+  end
+
+  def isGameInProgress(gameState) do
+    gameState.gameState == :playing
   end
 
 
