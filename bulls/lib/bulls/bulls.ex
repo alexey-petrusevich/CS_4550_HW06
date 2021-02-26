@@ -24,6 +24,12 @@ defmodule FourDigits.Game do
         p3: "",
         p4: ""
       },
+      playersReady: %{
+        p1: false,
+        p2: false,
+        p3: false,
+        p4: false
+      },
       currentGuesses: %{
         p1: "",
         p2: "",
@@ -38,10 +44,36 @@ defmodule FourDigits.Game do
       },
       wins: %{}, # keeps track of all the players' wins
       losses: %{}, # keeps track of all the players' losses
-      gameState: :setUp, # :setUp :playing :gameOver
+      gameState: :setUp, # :setUp :gameFull :playing :gameOver
       status: "",
       secret: generateSecret()
     }
+  end
+
+
+  # updates given game state with a new user joins
+  def updateJoin(gameState, playerName) do
+    if (gameState.gameState)
+  end
+
+  def toggleReady(gameState, playerName) do
+    # get player atom (key) given playerName
+    player = getPlayerAtom(gameState, playerName)
+    if (player == nil) do
+      # player not found - do nothing
+      gameState
+    else
+      # else update players ready
+      playersReady = %{gameState.playersReady | player: true}
+      # update game state with new players ready
+      %{gameState | playersReady: playersReady}
+    end
+  end
+
+  # return true if the game is full (e.g. the number
+  # of players has reached 4
+  def isGameFull(gameState) do
+    length(gameState.playerName) >= 4
   end
 
 
@@ -115,6 +147,8 @@ defmodule FourDigits.Game do
     newState = updateWinnersList(gameState, gameState.playerNames)
     # check if there is at least one winner
     if (hasWinner(newState, newState.playerNames)) do
+      # TODO: increment wins and losses
+
       # update game state to gameOver
       %{newState | gameState: :gameOver}
     else

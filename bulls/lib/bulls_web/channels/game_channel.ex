@@ -6,9 +6,10 @@ defmodule BullsWeb.GameChannel do
 
   # this method is called when a new game is created
   @impl true
-  def join("game:" <> gameName, payload, socket) do
-    if authorized?(payload) do
+  def join("game:" <> gameName, %{"playerName" => playerName}, socket) do
       # start game server (a.k.a. initialize new game when joined)
+      # this would not start a duplicate server - all the keys in corresponding
+      # Registry are unique
       GameServer.start(gameName)
       # create new socket, and assign game name and game state to the socket
       socket = socket
@@ -16,16 +17,22 @@ defmodule BullsWeb.GameChannel do
                |> assign(:gameName, gameName)
       # get state of the game from the server (process)
       # here the game should be fresh - no guesses made
-      game = GameServer.peek(gameName)
+      # or the game
+      gameState = GameServer.peek(gameName)
+      # update the game with new user and change the state if necessary
+      if (!Game.isGameFull(gameState)) do
+        game = Game.updateJoin(gameState, playerName)
+      end
       # truncate any secret info and reveal only what is necessary
       # to the caller
       view = Game.view(game)
       # return view back to the caller
       {:ok, view, socket}
-    else
-      {:error, %{reason: "unauthorized"}}
-    end
+
   end
+
+
+
 
   # given playerName, gameName, and newGuess, updates the state
   # of the game and returns new state
@@ -52,6 +59,19 @@ defmodule BullsWeb.GameChannel do
   end
 
 
+  def handle_in("ready", %{"playerName" => playerName}, socket) do
+    # retrieve saved game name from the socket
+    # and mark it s ready
+    view = socket.assigns[:gameName]
+           |> GameServer.playerReady(gameName, playerName)
+           |> Game.view()
+    # broadcast the view to everyone connected to the socket
+    broadcast(socket, "view", view)
+    # send a reply with the view to the caller
+    {:reply, {:ok, view}, socket}
+  end
+
+
   # this endpoint listens to "reset" messages
   @impl true
   def handle_in("reset", _, socket) do
@@ -65,9 +85,6 @@ defmodule BullsWeb.GameChannel do
     # send a reply back to the caller
     {:reply, {:ok, view}, socket}
   end
-
-  # TODO: add endpoint for returning wins and losses to the caller
-  # TODO: games and losses should be for ALL the games
 
 
   # Channels can be used in a request/response fashion

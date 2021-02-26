@@ -65,6 +65,10 @@ defmodule FourDigits.GameServer do
     GenServer.call(reg(gameName), {:makeGuess, gameName, playerName, newGuess})
   end
 
+  def playerReady(gameName, playerName) do
+    GenServer.call(reg(gameName), {:ready, playerName})
+  end
+
 
   # returns the state of the game given the name of the game
   # this is a wrapper method for GenServer.call -> :peek
@@ -84,7 +88,7 @@ defmodule FourDigits.GameServer do
   # here game is retrieved from the registry
   # from is info about the caller
   # game -> state of the game
-  def handle_call({:reset, gameName}, _from, game) do
+  def handle_call({:reset, gameName}, _from, gameState) do
     # create new game
     game = Game.new
     # BackupAgent has already been started by this point
@@ -104,6 +108,12 @@ defmodule FourDigits.GameServer do
     {:reply, game, game}
   end
 
+  def handle_call({:ready, gameName, playerName}, _from, gameState) do
+    game = Game.toggleReady(gameState, playerName)
+    BackupAgent.put(gameName, game)
+    {:reply, game, game}
+  end
+
   # simply returns the state of the game at any moment
   # for the callers
   def handle_call({:peek, gameName}, _from, gameState) do
@@ -119,9 +129,10 @@ defmodule FourDigits.GameServer do
   # TODO: if the game is won, reset the game, and change the state from gameOver
   # TODO: modify the game such that the guesses are not being sent back until this function is being called
   def handle_info(:pook, gameState) do
-    #    game = Game.guess(game, "q")
+    # update
+    gameName = gameState.gameName
     BullsWeb.Endpoint.broadcast!(
-      "game:1",
+      "game:{gameName}",
       # FIXME: Game name should be in state
       "view",
       Game.view(gameState)
