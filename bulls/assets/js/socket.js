@@ -33,32 +33,40 @@ export function ch_join(cb) {
     callback(state)
 }
 
-export function ch_login(gameName) {
-    channel.push("login", {gameName: gameName})
+export function ch_login() {
+    channel.push("login", {})
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to login", resp)
         });
 }
 
-export function ch_join_as_observer(gameName) {
-    channel.push("ch_join_as_observer", {gameName: gameName})
+export function ch_ready(playerName) {
+    channel.push("ready", {playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
-            console.log("unable to login", resp)
+            console.log("unable to select ready", resp)
         });
 }
 
-export function ch_join_as_player(playerName, gameName) {
-    channel.push("join_as_player", {playerName: playerName, gameName: gameName})
+export function ch_join_as_observer() {
+    channel.push("ch_join_as_observer", {})
         .receive("ok", state_update)
         .receive("error", resp => {
-            console.log("unable to login", resp)
+            console.log("unable to join as observer", resp)
+        });
+}
+
+export function ch_join_as_player(playerName) {
+    channel.push("join_as_player", {playerName: playerName})
+        .receive("ok", state_update)
+        .receive("error", resp => {
+            console.log("unable to join as player", resp)
         });
 }
 
 export function ch_push(guess, playerName) {
-    channel.push("guess", {playerName: playerName, guess: guess})
+    channel.push("guess", {guess: guess, playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to push", resp)

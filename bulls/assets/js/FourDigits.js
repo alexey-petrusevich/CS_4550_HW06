@@ -1,16 +1,14 @@
 import React, {useState, useEffect} from 'react'
 import "milligram";
 import {hasGameEnded} from "./game";
-import {ch_push, ch_join, ch_reset, ch_login} from "./socket";
+import {ch_push, ch_join, ch_reset, ch_login, ch_ready, ch_join_as_player, ch_join_as_observer} from "./socket";
 
-// TODO: update the game such that it gets username and game name before
-// TODO: proceeding to the game
-// TODO: add button select - player or observer
+
 
 function FourDigits() {
     const [state, setState] = useState({
-        playerGuesses: {p1: [], p2: [], p3: [], p4: []},
-        playerHints: {p1: [], p2: [], p3: [], p4: []},
+        playerGuesses: { p1: [], p2: [], p3: [], p4: [] },
+        playerHints: { p1: [], p2: [], p3: [], p4: [] },
         playerNames: [],
         winners: {},
         wins: {},
@@ -23,6 +21,8 @@ function FourDigits() {
     const [gameName, setGameName] = useState("");
     export default gameName;
     const [playerName, setPlayerName] = useState("");
+    const [isGameFull, setIsGameFull] = useState(false);
+    const [isUserObserver, setIsUserObserver] = useState(false);
 
 
     // TODO: add exit button to playing screen
@@ -31,7 +31,7 @@ function FourDigits() {
     // TODO: add reset button on the playing page
     // TODO: add wins/losses statistics to the setup page
 
-    let {playerGuesses, playerHints, playerNames, gameName, gameState} = gameState;
+    let { playerGuesses, playerHints, playerNames, gameName, gameState } = gameState;
 
     useEffect(() => {
         ch_join(setState)
@@ -39,38 +39,93 @@ function FourDigits() {
 
 
 
+    // IF STATEMENTS THAT DIRECTLY UPDATE STATE
+
+    // check if game is full to update elements
+    if (gameState === "gameFull") {
+        setIsGameFull(true);
+    } else {
+        setIsGameFull(false);
+    }
+
+    // check if user is a player to update elements
+    if (playerNames.includes(playerName)) {
+        setIsUserObserver(false);
+    } else {
+        setIsUserObserver(true);
+    }
+
+
 
     // FUNCTIONS THAT DIRECTLY UPDATE STATE
 
     // updates the guess state
     function update_guess(input) {
-      setGuess(input.target.value)
+        setGuess(input.target.value)
     }
 
     // updates the playerName state
     function update_playername(input) {
-      setPlayerName(input.target.value)
+        setPlayerName(input.target.value)
     }
 
     // updates the gameName state
     function update_gamename(input) {
-      setGameName(input.target.value)
+        setGameName(input.target.value)
     }
 
 
 
     // FUNCTIONS THAT COMMUNICATE CHANGES TO THE CHANNEL
 
-    function join_game() {
-            ch_login({playerName: playerName, gameName: gameName})
+    // calls ch_login to get game information
+    function login() {
+        ch_login();
+
+        if (gameState === "setUp" || gameState === "gameFull" || gameState === "gameOver") {
+            JoinPage();
         }
 
-    // calls ch_push to make guess
-    function make_guess() {
-        ch_push({playerName: playerName, guess: guess});
+        if (gameState === "playing") {
+            if (playerNames.includes(playerName)) {
+                PlayingPage();
+            } else {
+                ch_join_as_observer();
+                PlayingPage();
+            }
+        }
     }
 
-    // resets the game or something
+    // marks a player as ready
+    function ready() {
+        ch_ready({playerName: playerName});
+    }
+
+    // user joins game as observer
+    function join_as_observer() {
+        ch_join_as_observer();
+
+        if (gameState === "setUp" || gameState === "gameFull" || gameState === "gameOver") {
+            WaitingPage();
+        }
+
+        if (gameState === "playing") {
+            PlayingPage();
+        }
+    }
+
+    // user joins game as player
+    function join_as_player() {
+        ch_join_as_player({playerName: playerName});
+        WaitingPage();
+    }
+
+    // user makes guess
+    function make_guess() {
+        ch_push({guess: guess,playerName: playerName});
+    }
+
+    // reset the game or something
     function reset() {
         console.log("game reset");
         ch_reset();
@@ -107,8 +162,8 @@ function FourDigits() {
                                 />
                                 <input
                                     type="submit"
-                                    onClick={join_game}
-                                    value="Join Game"
+                                    onClick={login}
+                                    value="Login"
                                 />
                             </fieldset>
                         </form>
@@ -118,89 +173,10 @@ function FourDigits() {
         }
 
 
-    // FUNCTIONS RELATED TO JOIN AS PAGE
+    // FUNCTIONS RELATED TO JOIN PAGE
 
-
-
-    // FUNCTIONS RELATED TO SETUP PAGE
-
-
-
-    // FUNCTIONS RELATED TO PLAYING PAGE
-
-    /**
-     * Returns a grid containing information about past guesses.
-     *
-     * @param guesses array with all the guesses
-     * @param hints arrays with all the hints
-     * @returns {JSX.Element} an element containing a grid with all the info
-     * @constructor
-     */
-    function ResultTable({guesses, hints}) {
-        let guessesHints = [];
-
-        // TODO: replace this with for-each loop???
-        // TODO: to display guesses and hints based on specifications
-        // TODO: remove counter, add columns for each user (guess and hint pair for each player)
-        for (let i = 0; i < 8; ++i) {
-            guessesHints.push(
-                <div className="row">
-                    <div className="column">
-                        <p>{i + 1}</p>
-                    </div>
-                    <div className="column">
-                        <p>
-                            {guesses[i]}
-                        </p>
-                    </div>
-                    <div className="column">
-                        <p>
-                            {hints[i]}
-                        </p>
-                    </div>
-                </div>
-            );
-        }
-
-        console.log("result table render");
-
-        return (
-            <div className="results">
-                <div className="row">
-                    <div className="column">
-                        <div className="colHeader">
-                            <p>Num guesses</p>
-                        </div>
-                    </div>
-                    <div className="column">
-                        <div className="colHeader">
-                            <p>Guess</p>
-                        </div>
-                    </div>
-                    <div className="column">
-                        <div className="colHeader">
-                            <p>Hint</p>
-                        </div>
-                    </div>
-                </div>
-                {guessesHints}
-            </div>
-        );
-    }
-
-    function join_as_obs() {
-        // TODO: implement
-    }
-
-    function join_as_play() {
-        //     TODO: implement
-    }
-
-    function game_not_full() {
-        // TODO: implement
-    }
-
-    function JoinPage({gameName}) {
+    // returns the join page html
+    function JoinPage() {
         return (
             <div>
                 <div className="container" style="text-align:center">
@@ -211,13 +187,13 @@ function FourDigits() {
                         <fieldset>
                             <input
                                 type="submit"
-                                onClick={join_as_play}
+                                onClick={join_as_player}
                                 value="Player"
-                                disabled={game_not_full}
+                                disabled={isGameFull}
                             />
                             <input
                                 type="submit"
-                                onClick={join_as_obs}
+                                onClick={join_as_observer}
                                 value="Observer"
                             />
                         </fieldset>
@@ -227,20 +203,99 @@ function FourDigits() {
         );
     }
 
-    function game_over() {
-        // TODO: implement
-    }
 
-    function submit_pass() {
-        // TODO: implement
-    }
 
-    function PlayingPage({players, guesses, results}) {
+    // FUNCTIONS RELATED TO WAITING PAGE
+
+    // returns the waiting page html
+    function WaitingPage({players, ready}) {
         return (
             <div>
                 <div className="container" style="text-align:center">
                     <h1>Bulls and Cows</h1>
-                    <h2>GO! Timer: (https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>
+                    <h2>Waiting on Players</h2>
+                    <h3>Last rounds winners: {winners}</h3>
+                    <table>
+                        <tr>
+                            <th>Player:</th>
+                            <th>Name:</th>
+                            <th>Wins:</th>
+                            <th>Losses:</th>
+                            <th>Ready?</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>{players[0]}</td>
+                            <td></td>
+                            <td></td>
+                            <td>{ready[0]}</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>{players[1]}</td>
+                            <td></td>
+                            <td></td>
+                            <td>{ready[1]}</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>{players[2]}</td>
+                            <td></td>
+                            <td></td>
+                            <td>{ready[2]}</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>{players[3]}</td>
+                            <td></td>
+                            <td></td>
+                            <td>{ready[3]}</td>
+                        </tr>
+                    </table>
+                    <input
+                        type="submit"
+                        onClick={ready}
+                        value="Ready"
+                        disabled={isUserObserver}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+
+
+    // FUNCTIONS RELATED TO PLAYING PAGE
+
+    // passes a turn
+    function pass() {
+        setGuess("    ");
+        make_guess();
+    }
+
+    // returns the playing page html
+    function PlayingPage() {
+        let guessesHints = [];
+        for (let i = 0; i < playerGuesses.p1.length; ++i) {
+            guessesHints.push(
+                <tr>
+                    <td>{playerGuesses.p1[i]}<td>
+                    <td>{playerHints.p1[i]}<td>
+                    <td>{playerGuesses.p2[i]}<td>
+                    <td>{playerHints.p2[i]}<td>
+                    <td>{playerGuesses.p3[i]}<td>
+                    <td>{playerHints.p3[i]}<td>
+                    <td>{playerGuesses.p4[i]}<td>
+                    <td>{playerHints.p4[i]}<td>
+				</tr>
+            );
+        }
+
+        return (
+            <div>
+                <div className="container" style="text-align:center">
+                    <h1>Bulls and Cows</h1>
+                    <h2>GO! Timer: </h2>//(https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>
                     <table>
                         <tr>
                             <th>{players[0]}</th>
@@ -262,16 +317,7 @@ function FourDigits() {
                             <th>Guess:</th>
                             <th>Hint:</th>
                         </tr>
-                        <tr>
-                            <td>{guesses[0][i]}</td>
-                            <td>{results[0][i]}</td>
-                            <td>{guesses[1][i]}</td>
-                            <td>{results[1][i]}</td>
-                            <td>{guesses[2][i]}</td>
-                            <td>{results[2][i]}</td>
-                            <td>{guesses[3][i]}</td>
-                            <td>{results[3][i]}</td>
-                        </tr>
+                        {guessesHints}
                     </table>
                     <input
                         type="text"
@@ -279,94 +325,24 @@ function FourDigits() {
                         placeholder="####"
                         maxLength="4"
                         minLength="4"
-                        disabled={game_over}
+                        disabled={isUserObserver}
                     />
                     <input
                         type="submit"
                         onClick={make_guess}
                         value="Submit Guess"
-                        disabled={game_over}
+                        disabled={isUserObserver}
                     />
                     <input
                         type="submit"
-                        onClick={submit_pass}
+                        onClick={pass}
                         value="Pass"
-                        disabled={game_over}
+                        disabled={isUserObserver}
                     />
                 </div>
             </div>
         );
     }
-
-
-    function player_ready() {
-        // TODO: implement
-    }
-
-    function not_sure_what_to_do_here() {
-        // TODO: implement
-    }
-
-
-    function WaitingPage({players, ready}) {
-        return (
-            <div>
-                <div className="container" style="text-align:center">
-                    <h1>Bulls and Cows</h1>
-                    <h2>Waiting on Players</h2>
-                    <table>
-                        <tr>
-                            <th>Player</th>
-                            <th>Name</th>
-                            <th>Ready?</th>
-                        </tr>
-                        <tr>
-                            <th>1</th>
-                            <th>{players[0]}</th>
-                            <th>{ready[0]}</th>
-                        </tr>
-                        <tr>
-                            <th>2</th>
-                            <th>{players[1]}</th>
-                            <th>{ready[1]}</th>
-                        </tr>
-                        <tr>
-                            <th>3</th>
-                            <th>{players[2]}</th>
-                            <th>{ready[2]}</th>
-                        </tr>
-                        <tr>
-                            <th>4</th>
-                            <th>{players[3]}</th>
-                            <th>{ready[3]}</th>
-                        </tr>
-                    </table>
-                    <input
-                        type="submit"
-                        onClick={player_ready}
-                        value="Ready"
-                        disabled={not_sure_what_to_do_here}
-                    />
-                </div>
-            </div>
-        );
-    }
-
-
-    function StatusBar({status}) {
-        return (
-            <div className="status">
-                <div className="row">
-                    <div className="column">
-                        <p>
-                            {status}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
 
 
 }
