@@ -9,11 +9,12 @@ import {ch_push, ch_join, ch_reset, ch_login} from "./socket";
 
 function FourDigits() {
     const [state, setState] = useState({
-        playerGuesses: {p1: [], p2: {}, p3: [], p4: []},
-        playerHints: {p1: [], p2: {}, p3: [], p4: []},
+        playerGuesses: {p1: [], p2: [], p3: [], p4: []},
+        playerHints: {p1: [], p2: [], p3: [], p4: []},
         playerNames: [],
-        gameName: "",
-        gameState: ""
+        winner: {},
+        gameState: "",
+        status: ""
     });
     // for textfield
     const [guess, setGuess] = useState("");
@@ -171,29 +172,205 @@ function FourDigits() {
         );
     }
 
+    function join_as_obs() {
+        // TODO: implement
+    }
 
-    /**
-     * Returns the status bar that displays errors or win/lose message
-     * @param status string being placed into the status bar
-     * @returns {JSX.Element}      an element containing status info
-     * @constructor
-     */
-    function StatusBar({status}) {
+    function join_as_play() {
+        //     TODO: implement
+    }
+
+    function game_not_full() {
+        // TODO: implement
+    }
+
+    function JoinPage({gameName}) {
         return (
-            <div className="status">
-                <div className="row">
-                    <div className="column">
-                        <p>
-                            {status}
-                        </p>
-                    </div>
+            <div>
+                <div className="container" style="text-align:center">
+                    <h1>Bulls and Cows</h1>
+                    <h2>Join {gameName} as</h2>
+                    <br/>
+                    <form>
+                        <fieldset>
+                            <input
+                                type="submit"
+                                onClick={join_as_play}
+                                value="Player"
+                                disabled={game_not_full}
+                            />
+                            <input
+                                type="submit"
+                                onClick={join_as_obs}
+                                value="Observer"
+                            />
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         );
     }
-}
+
+    function join_game() {
+        //    TODO: implement
+    }
+
+    function update_gamename() {
+        //    TODO: implement and add another useState hook
+    }
+
+    function update_username() {
+        //    TODO: implement and add another useState hook
+    }
+
+    function Login({userName, gameName}) {
+        return (
+            <div>
+                <div className="container">
+                    <h1 style="text-align:center">Bulls and Cows</h1>
+                    <h2 style="text-align:center">Multiplayer Login</h2>
+                    <form>
+                        <fieldset>
+                            <label>Game ID</label>
+                            <input
+                                type="text"
+                                id="sourceText"
+                                placeholder="roomtown123"
+                                onChange={update_gamename}
+                                required
+                            />
+                            <label>User ID</label>
+                            <input
+                                type="text"
+                                id="username"
+                                placeholder="coolguy456"
+                                onChange={update_username}
+                                required
+                            />
+                            <input
+                                type="submit"
+                                onClick={join_game}
+                                value="Join Game"
+                            />
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        );
+    }
 
 
-export default FourDigits;
+    function Login({userName, gameName}) {
+        return (
+            <div>
+                <div className="container" style="text-align:center">
+                    <h1>Bulls and Cows</h1>
+                    <h2>GO! Timer: (https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>
+                    <table>
+                        <tr>
+                            <th>{players[0]}
+                                <th>
+                                    <th>
+                                        <th>
+                                            <th>{players[1]}
+                                                <th>
+                                                    <th>
+                                                        <th>
+                                                            <th>{players[2]}
+                                                                <th>
+                                                                    <th>
+                                                                        <th>
+                                                                            <th>{players[3]}
+                                                                                <th>
+                                                                                    <th>
+                                                                                        <th>
+                        </tr>
+                        <tr>
+                            <th>Guess:
+                                <th>
+                                    <th>Hint:
+                                        <th>
+                                            <th>Guess:
+                                                <th>
+                                                    <th>Hint:
+                                                        <th>
+                                                            <th>Guess:
+                                                                <th>
+                                                                    <th>Hint:
+                                                                        <th>
+                                                                            <th>Guess:
+                                                                                <th>
+                                                                                    <th>Hint:
+                                                                                        <th>
+                        </tr>
+                        <tr>
+                            <td>{guesses[0][i]}
+                                <td>
+                                    <td>{results[0][i]}
+                                        <td>
+                                            <td>{guesses[1][i]}
+                                                <td>
+                                                    <td>{results[1][i]}
+                                                        <td>
+                                                            <td>{guesses[2][i]}
+                                                                <td>
+                                                                    <td>{results[2][i]}
+                                                                        <td>
+                                                                            <td>{guesses[3][i]}
+                                                                                <td>
+                                                                                    <td>{results[3][i]}
+                                                                                        <td>
+                        </tr>
+                    </table>
+                    <input
+                        type="text"
+                        onChange={update_guess}
+                        placeholder="####"
+                        maxLength="4"
+                        minLength="4"
+                        disabled={game_over}
+                    />
+                    <input
+                        type="submit"
+                        onClick={submit_guess}
+                        value="Submit Guess"
+                        disabled={game_over}
+                    />
+                    <input
+                        type="submit"
+                        onClick={submit_pass}
+                        value="Pass"
+                        disabled={game_over}
+                    />
+                </div>
+            </div>
+    );
+    }
+
+
+
+    function StatusBar(
+        {
+            status
+        }
+    )
+        {
+            return (
+                <div className="status">
+                    <div className="row">
+                        <div className="column">
+                            <p>
+                                {status}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+    }
+
+
+    export default FourDigits;
 
 

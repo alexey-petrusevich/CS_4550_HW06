@@ -40,6 +40,7 @@ export function ch_login(playerName, gameName) {
 }
 
 export function ch_push(guess) {
+    // TODO: add player name
     channel.push("guess", guess)
         .receive("ok", state_update)
         .receive("error", resp => {

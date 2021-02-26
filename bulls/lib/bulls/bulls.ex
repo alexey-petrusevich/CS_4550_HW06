@@ -245,13 +245,19 @@ end
 
 # returns a view to the user (what the user should see)
 def view(state) do
-  # return a map with guesses, hints, and status
   %{
-    guesses: state.guesses,
-    hints: state.hints,
+    playerGuesses: state.playerGuesses,
+    playerHints: state.playerHints,
+    playerNames: state.playerNames,
+    winners: state.winners,
+    gameState: state.gameState,
     status: state.status
   }
 end
+
+
+
+
 
 # generates a random 4-digit integer
 def generateSecret() do
