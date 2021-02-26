@@ -4,6 +4,7 @@ defmodule BullsWeb.GameChannel do
   alias FourDigits.Game
   alias FourDigits.GameServer
 
+
   # this method is called when a new channel is created
   @impl true
   def join("game:" <> gameName, payload, socket) do
@@ -94,6 +95,8 @@ defmodule BullsWeb.GameChannel do
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
     else
+      # else game is not in progress - no guessing allowed
+      # simply return the game state
       view = Game.view(gameState)
       # broadcast the view to everyone connected to the socket
       broadcast(socket, "view", view)
@@ -102,10 +105,13 @@ defmodule BullsWeb.GameChannel do
     end
   end
 
+
   @impl true
   def handle_in("ready", %{"playerName" => playerName}, socket) do
+    # retrieve game state from the game server
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
+    # if game is full or in set up state, find the player and mark him ready
     if (Game.isGameFull(gameState)
         || Game.isGameInSetUp(gameState)) do
       # retrieve saved game name from the socket
@@ -134,7 +140,7 @@ defmodule BullsWeb.GameChannel do
   def handle_in("reset", _, socket) do
     #    user = socket.assigns[:user]
     view = socket.assigns[:gameName] # get name of the game and pass it to the reset
-      # game server will use the saved name to find the name in the Registry
+           # game server will use the saved name to find the name in the Registry
            |> GameServer.reset() # reset the game and get fresh game state
            |> Game.view() # truncate all secrets by passing fresh state to the view() method
     # broadcast new view to everyone connected to this socket
@@ -151,6 +157,7 @@ defmodule BullsWeb.GameChannel do
     {:reply, {:ok, payload}, socket}
   end
 
+
   # It is also common to receive messages from the client and
   # broadcast to everyone in the current topic (game:lobby).
   @impl true
@@ -159,6 +166,7 @@ defmodule BullsWeb.GameChannel do
     {:noreply, socket}
   end
 
+  
   # Add authorization logic here as required.
   defp authorized?(_payload) do
     true
