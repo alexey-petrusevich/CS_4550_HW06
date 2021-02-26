@@ -164,6 +164,13 @@ defmodule FourDigits.Game do
     gameState.gameState == :gameOver
   end
 
+
+  # returns true if the game is in the :setUp state
+  def isGameInSetUp(gameState) do
+    gameState.gameState == :setUp
+  end
+
+
   # returns true if all players are ready
   def isAllReady(gameState, playerNames) do
     if (length(playerNames) == 0) do
