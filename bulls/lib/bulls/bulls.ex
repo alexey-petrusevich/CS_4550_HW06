@@ -641,6 +641,7 @@ defmodule FourDigits.Game do
       playerGuesses: state.playerGuesses,
       playerHints: state.playerHints,
       playerNames: state.playerNames,
+      observerNames: state.observerNames,
       wins: state.wins,
       losses: state.losses,
       gameState: state.gameState,
