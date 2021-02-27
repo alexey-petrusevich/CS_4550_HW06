@@ -234,7 +234,7 @@ defmodule FourDigits.Game do
   def getPlayerAtom(gameState, playerName) do
     # get all the keys from playerMap (p1, p2, p3, p4)
     IO.inspect("getting keys from player map")
-    mapKeys = gameState.playerMap.keys() # p1, p2, p3, p4
+    mapKeys = Map.keys(gameState.playerMap) # p1, p2, p3, p4
     IO.inspect("got the keys from players map")
     IO.inspect(mapKeys)
     # use the helper to get the right key associated with given player name
