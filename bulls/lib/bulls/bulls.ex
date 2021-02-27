@@ -255,7 +255,7 @@ defmodule FourDigits.Game do
     else
       # check if the value of the first entry in the list of keys in the given map
       # matches given playerName
-      IO.inspect("checking if key = " <> hd(keys) <> " has value of playerName = " <> playerName)
+      IO.inspect("checking if key = " <> hd(mapKeys) <> " has value of playerName = " <> playerName)
       if (Map.get(map, hd(mapKeys)) == playerName) do
         # found the key of the given playerName - return to the caller
         IO.inspect("key found!")
