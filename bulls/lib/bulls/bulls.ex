@@ -130,7 +130,7 @@ defmodule FourDigits.Game do
   # and adds it there
   # NOTE: if not spare spots left, throws an error
   def addToPlayerMapHelper(gameState, playerName, keys) do
-    if (length(keys) == 0) do
+    if (List.length(keys) == 0) do
       # end of list - player cannot be added
       raise "Error: trying to add player to the full game (addPlayerMap)"
     else
@@ -185,7 +185,7 @@ defmodule FourDigits.Game do
   # return true if the game is full (e.g. the number
   # of players has reached 4
   def isGameFull(gameState) do
-    length(gameState.playerNames) >= 4
+    List.length(gameState.playerNames) >= 4
   end
 
 
@@ -204,7 +204,7 @@ defmodule FourDigits.Game do
   # returns true if all players are ready
   def isAllReady(gameState, playerNames) do
     # if all other players are ready, then everyone is ready
-    if (length(playerNames) == 0) do
+    if (List.length(playerNames) == 0) do
       true
     else
       # else check if this player is ready and the rest are ready
@@ -254,7 +254,7 @@ defmodule FourDigits.Game do
     IO.inspect(map)
     IO.inspect("playerName")
     IO.inspect(playerName)
-    if (length(mapKeys) == 0) do
+    if (List.length(mapKeys) == 0) do
       # if here, playerName somehow not found in the map
       IO.inspect("player name not found????")
       nil
@@ -331,7 +331,7 @@ defmodule FourDigits.Game do
 
   # a helper function that translates a list of playerNames to a list of atoms
   def stringsAsAtoms(playerList, atomList) do
-    if (length(playerList) == 0) do
+    if (List.length(playerList) == 0) do
       atomList
     else
       atomList = atomList ++ [String.to_atom(hd(playerList))]
@@ -342,7 +342,7 @@ defmodule FourDigits.Game do
 
   # a helper function that increments all the players given player keys
   def incrementWinsLossesHelp(gameState, playerNameKeys) do
-    if (length(playerNameKeys) == 0) do
+    if (List.length(playerNameKeys) == 0) do
       # game has been updated
       gameState
     else
@@ -385,7 +385,7 @@ defmodule FourDigits.Game do
 
   # returns true if there is at least one winner
   def hasWinner(gameState, playerNames) do
-    if (length(playerNames) == 0) do
+    if (List.length(playerNames) == 0) do
       # if reached the end of the list, no winners
       false
     else
@@ -420,7 +420,7 @@ defmodule FourDigits.Game do
 
   # a helper method for updateWinnerStatus
   def updateWinnersStatusHelper(gameState, status, playerNames) do
-    if (length(playerNames) == 0) do
+    if (List.length(playerNames) == 0) do
       # end of list, return game state with updates status
       %{gameState | status: String.trim(status)}
     else
@@ -440,7 +440,7 @@ defmodule FourDigits.Game do
   # IMPORTANT NOTE: the list of current guesses shall not be cleared at this point
   # the return state will have updated the map of winners stored withing game state
   def updateWinnersList(gameState, playerNames) do
-    if (length(playerNames) == 0) do
+    if (List.length(playerNames) == 0) do
       # winners list has been updated
       gameState
     else
@@ -511,7 +511,7 @@ defmodule FourDigits.Game do
   # a helper function that is used by makeAllGuesses
   # updates the guesses and hints for all the players
   def makeAllGuessesHelper(gameState, playerNames) do
-    if (length(playerNames) == 0) do
+    if (List.length(playerNames) == 0) do
       # all players have been updated
       gameState
     else
@@ -545,7 +545,7 @@ defmodule FourDigits.Game do
 
   # helper for isValidInput, but accept a list of characters
   def isValidInputHelper(list) do
-    if (length(list) > 0) do
+    if (List.length(list) > 0) do
       isValidChar(hd(list)) && isValidInputHelper(tl(list))
     else
       true
@@ -590,7 +590,7 @@ defmodule FourDigits.Game do
   # returns a map containing As and Bs for bulls and cows game
   # assumes secretList, and guessList have same length
   def getHintHelper(secretListOriginal, secretList, guessList, hintCounts) do
-    if (length(secretList) > 0) do
+    if (List.length(secretList) > 0) do
       cond do
         # A - places match
         hd(secretList) == hd(guessList) ->
@@ -648,7 +648,7 @@ defmodule FourDigits.Game do
 
   # returns a string representation of the list (map)
   def mapToString(list, result) do
-    if (length(list) > 0) do
+    if (List.length(list) > 0) do
       result = result <> to_string(hd(list))
       mapToString(tl(list), result)
     else
