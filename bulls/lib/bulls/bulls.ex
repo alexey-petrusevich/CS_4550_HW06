@@ -113,6 +113,7 @@ defmodule FourDigits.Game do
   # adds a given playerName to the playerMap
   def addToPlayerMap(gameState, playerName) do
     # get player atom (key) given playerName
+    IO.inspect("calling getPlayerAtom")
     player = getPlayerAtom(gameState, playerName)
     IO.inspect("player with name " <> playerName <> " has key " <> player)
     # get all the ksy from the player map (e.g. p1, p2, p3, p4)
@@ -232,8 +233,12 @@ defmodule FourDigits.Game do
   # value in the map
   def getPlayerAtom(gameState, playerName) do
     # get all the keys from playerMap (p1, p2, p3, p4)
-    mapKeys = gameState.playerMap.keys()
+    IO.inspect("getting keys from player map")
+    mapKeys = gameState.playerMap.keys() # p1, p2, p3, p4
+    IO.inspect("got the keys from players map")
+    IO.inspect(mapKeys)
     # use the helper to get the right key associated with given player name
+    IO.inspect("calling getPlayerAtomHelp")
     getPlayerAtomHelp(mapKeys, gameState.playerMap, playerName)
   end
 
@@ -242,16 +247,21 @@ defmodule FourDigits.Game do
   # the map which keys belong to, and the value (playerName)
   # if playerNa,e nt found returns nil
   def getPlayerAtomHelp(mapKeys, map, playerName) do
+    IO.inspect("in getPlayerAtomHelp")
     if (length(mapKeys) == 0) do
       # if here, playerName somehow not found in the map
+      IO.inspect("player name not found????")
       nil
     else
       # check if the value of the first entry in the list of keys in the given map
       # matches given playerName
+      IO.inspect("checking if key = " <> hd(keys) <> " has value of playerName = " <> playerName)
       if (Map.get(map, hd(mapKeys)) == playerName) do
         # found the key of the given playerName - return to the caller
+        IO.inspect("key found!")
         hd(mapKeys)
       else
+        IO.inspect("recurring through the rest of keys")
         # check the rest of the map keys
         getPlayerAtomHelp(tl(mapKeys), map, playerName)
       end
