@@ -119,16 +119,16 @@ function WaitingPage({state}) {
             </div>
             <div className="row">
               <div className="column">
-                {state.playersReady.p1}
+                {state.playersReady.p1.toString()}
               </div>
               <div className="column">
-                {state.playersReady.p2}
+                {state.playersReady.p2.toString()}
               </div>
               <div className="column">
-                {state.playersReady.p3}
+                {state.playersReady.p3.toString()}
               </div>
               <div className="column">
-                {state.playersReady.p4}
+                {state.playersReady.p4.toString()}
               </div>
             </div>
           </div>
