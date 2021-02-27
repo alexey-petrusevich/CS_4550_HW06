@@ -13,7 +13,8 @@ let state = {
   playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
   playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
   playerNames: [],
-  playersReady: new Map([["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
+  playersReady: new Map(
+      [["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
   wins: new Map(),
   losses: new Map(),
   gameState: "",
@@ -38,6 +39,7 @@ export function ch_join(cb) {
 
 // update the socket with new channel given the name of the game
 function updateChannel(gameName) {
+  console.log("in updateChannel, gameName = " + gameName)
   channel = socket.channel("game:" + gameName, {})
   channel.join()
   .receive("ok", state_update)
@@ -51,7 +53,8 @@ export function ch_login(playerName, gameName) {
   // update channel with new gameName
   updateChannel(gameName)
 
-  console.log("ch_login called")
+  console.log(
+      "ch_login called, playerName: " + playerName + " gameName: " + gameName)
   channel.push("login", {playerName: playerName})
   .receive("ok", state_update)
   .receive("error", resp => {
