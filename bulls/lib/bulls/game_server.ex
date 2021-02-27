@@ -30,6 +30,7 @@ defmodule FourDigits.GameServer do
     FourDigits.GameSupervisor.start_child(spec)
   end
 
+
   # starts this process (GenServer)
   def start_link(gameName) do
     # check if the game has been saved in the backup agent
@@ -66,6 +67,8 @@ defmodule FourDigits.GameServer do
     GenServer.call(reg(gameName), {:makeGuess, gameName, playerName, newGuess})
   end
 
+
+  # makes a call to ready
   def playerReady(gameName, playerName) do
     GenServer.call(reg(gameName), {:ready, playerName})
   end
@@ -78,6 +81,7 @@ defmodule FourDigits.GameServer do
     GenServer.call(reg(gameName), {:peek, gameName})
   end
 
+
   # star_link calls this method with gameState
   def init(game) do
     # calls :pook every 30 seconds
@@ -85,6 +89,7 @@ defmodule FourDigits.GameServer do
     Process.send_after(self(), :pook, 30_000)
     {:ok, game} # this is returned if start_link was successful
   end
+
 
   # here game is retrieved from the registry
   # from is info about the caller
@@ -99,6 +104,7 @@ defmodule FourDigits.GameServer do
     {:reply, game, game}
   end
 
+
   # handles guess calls from GenServer.call
   def handle_call({:makeGuess, gameName, playerName, newGuess}, _from, game) do
     # modifies the game with the new guess
@@ -109,11 +115,14 @@ defmodule FourDigits.GameServer do
     {:reply, game, game}
   end
 
+
+  # handles reset call from GenServer.call
   def handle_call({:ready, gameName, playerName}, _from, gameState) do
     game = Game.toggleReady(gameState, playerName)
     BackupAgent.put(gameName, game)
     {:reply, game, game}
   end
+
 
   # simply returns the state of the game at any moment
   # for the callers
@@ -124,17 +133,19 @@ defmodule FourDigits.GameServer do
     {:reply, game, game}
   end
 
+
   # this is used to broadcast to everyone on the channel the state of the game
-  # TODO: for every turn a player has not submitted a guess, add an empty string (pass)
-  # TODO to the list of guesses of that specific player
-  # TODO: if the game is won, reset the game, and change the state from gameOver
-  # TODO: modify the game such that the guesses are not being sent back until this function is being called
+  # handles pook calls (every 30 seconds by default)
   def handle_info(:pook, gameState) do
-    # update
-    gameName = gameState.gameName
+    # make all guesses - take current guesses and put them into player's guesses
+    # this also updates hints
+    newState = Game.makeAllGuesses(gameState)
+    # clear current guesses
+    newState = Game.clearCurrentGuesses(newState)
+    # check if the game has been won
+    newState = Game.checkWinners(newState)
     BullsWeb.Endpoint.broadcast!(
-      "game:{gameName}",
-      # FIXME: Game name should be in state
+      "game:" <> newState.gameName,
       "view",
       Game.view(gameState)
     )
