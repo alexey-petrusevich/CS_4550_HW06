@@ -65,8 +65,10 @@ defmodule FourDigits.Game do
       # create new state wth new list of playerNames
       newState = %{gameState | playerNames: playerNames}
       # add player to the playerMap
+      IO.inspect("adding to players map")
       newState = addToPlayerMap(newState, playerName)
       # add player to wins and losses (if not present)
+      IO.inspect("adding to wins losses map")
       newState = addToWinsLosses(newState, playerName)
       # check if the game is full, and update game state if so
       if (isGameFull(newState)) do
