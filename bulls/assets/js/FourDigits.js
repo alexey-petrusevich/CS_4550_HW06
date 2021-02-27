@@ -114,24 +114,20 @@ function WaitingPage({state}) {
           </div>
         </div>
     );
-    console.log("state: " + state)
-    console.log("playersRead: " + state.playersReady)
-    let playersReady = state.playersReady;
-    // let mapKeys = Array.from(map.keys());
 
     readyList.push(
         <div className="row">
           <div className="column">
-            {state.playersReady.get("p1")}
+            {state.playersReady.p1}
           </div>
           <div className="column">
-            {state.playersReady.get("p2")}
+            {state.playersReady.p2}
           </div>
           <div className="column">
-            {state.playersReady.get("p3")}
+            {state.playersReady.p3}
           </div>
           <div className="column">
-            {state.playersReady.get("p4")}
+            {state.playersReady.p4}
           </div>
         </div>
     );
@@ -216,9 +212,8 @@ function PlayPage({st}) {
       </div>
   );
 
-  function ResultTable({guessesMap, hintsMap}) {
-    let mapKeys = Array.from(guessesMap.keys()); // [p1, p2, p3, p4]
-    let numEntries = guessesMap.get(mapKeys[0]).length;
+  function ResultTable({guesses, hints}) {
+    let numEntries = guesses["p1"][0].length;
 
     function pushHeader() {
       let guessesHints = []
@@ -265,14 +260,14 @@ function PlayPage({st}) {
             <div className="column">
               <p>{i + 1}</p>
             </div>
-            {pushColumn(guessesMap.get(mapKeys[0])[i])}
-            {pushColumn(hintsMap.get(mapKeys[0])[i])}
-            {pushColumn(guessesMap.get(mapKeys[1])[i])}
-            {pushColumn(hintsMap.get(mapKeys[1])[i])}
-            {pushColumn(guessesMap.get(mapKeys[2])[i])}
-            {pushColumn(hintsMap.get(mapKeys[2])[i])}
-            {pushColumn(guessesMap.get(mapKeys[3])[i])}
-            {pushColumn(hintsMap.get(mapKeys[3])[i])}
+            {pushColumn(guesses["p1"][i])}
+            {pushColumn(hints["p1"][i])}
+            {pushColumn(guesses["p2"][i])}
+            {pushColumn(hints["p2"][i])}
+            {pushColumn(guesses["p3"][i])}
+            {pushColumn(hints["p3"][i])}
+            {pushColumn(guesses["4"][i])}
+            {pushColumn(hints["p4"][i])}
           </div>
       );
     }
@@ -305,7 +300,7 @@ function GameOver({state}) {
     let winsLosses = [];
     let wins = state.wins;
     let losses = state.losses;
-    let playerNames = Array.from(wins.keys());
+    let playerNames = Object.keys(wins);
     let numEntries = playerNames.length;
 
     // push header
@@ -374,14 +369,13 @@ function GameOver({state}) {
 function FourDigits() {
 
   const [state, setState] = useState({
-    playerGuesses: new Map(),
-    playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
+    playerGuesses: {},
+    playerHints: {},
     playerNames: [],
     observerNames: [],
-    playersReady: new Map(
-        [["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
-    wins: new Map(),
-    losses: new Map(),
+    playersReady: {},
+    wins: {},
+    losses: {},
     gameState: "",
     status: ""
   });

@@ -10,14 +10,13 @@ socket.connect()
 let channel = socket.channel("game:1", {})
 
 let state = {
-  playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
-  playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
+  playerGuesses: {},
+  playerHints: {},
   playerNames: [],
   observerNames: [],
-  playersReady: new Map(
-      [["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
-  wins: new Map(),
-  losses: new Map(),
+  playersReady: {},
+  wins: {},
+  losses: {},
   gameState: "",
   status: ""
 };
@@ -26,8 +25,6 @@ let callback = null;
 
 function state_update(st) {
   console.log("New State", st);
-  console.log("type of state? " + (typeof st))
-  console.log("type of map? " + (typeof st.wins))
   state = st;
   if (callback) {
     callback(st);
