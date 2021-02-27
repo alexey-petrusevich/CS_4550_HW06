@@ -1,15 +1,24 @@
 import React, {useState, useEffect} from 'react'
 import "milligram";
 import {hasGameEnded} from "./game";
-import {ch_push, ch_join, ch_reset, ch_login, ch_ready, ch_join_as_player, ch_join_as_observer} from "./socket";
-
+import {
+    ch_push,
+    ch_join,
+    ch_reset,
+    ch_login,
+    ch_ready,
+    ch_join_as_player,
+    ch_join_as_observer
+} from "./socket";
 
 
 function FourDigits() {
+
+    console.log("started four digits")
     // given states
     const [state, setState] = useState({
-        playerGuesses: { p1: [], p2: [], p3: [], p4: [] },
-        playerHints: { p1: [], p2: [], p3: [], p4: [] },
+        playerGuesses: {p1: [], p2: [], p3: [], p4: []},
+        playerHints: {p1: [], p2: [], p3: [], p4: []},
         playerNames: [],
         winners: {},
         wins: {},
@@ -20,12 +29,20 @@ function FourDigits() {
     // local states
     const [guess, setGuess] = useState("");
     const [gameName, setGameName] = useState("");
-    export default gameName;
     const [playerName, setPlayerName] = useState("");
     const [isGameFull, setIsGameFull] = useState(false);
     const [isUserObserver, setIsUserObserver] = useState(false);
 
-    let { playerGuesses, playerHints, playerNames, winners, wins, losses, gameState, status } = gameState;
+    let {
+        playerGuesses,
+        playerHints,
+        playerNames,
+        winners,
+        wins,
+        losses,
+        gameState,
+        status
+    } = gameState;
 
 
     useEffect(() => {
@@ -50,7 +67,6 @@ function FourDigits() {
     }
 
 
-
     // FUNCTIONS THAT DIRECTLY UPDATE STATE
 
     // updates the guess state
@@ -67,7 +83,6 @@ function FourDigits() {
     function update_gamename(input) {
         setGameName(input.target.value)
     }
-
 
 
     // FUNCTIONS THAT COMMUNICATE CHANGES TO THE CHANNEL
@@ -116,7 +131,7 @@ function FourDigits() {
 
     // user makes guess
     function make_guess() {
-        ch_push({guess: guess,playerName: playerName});
+        ch_push({guess: guess, playerName: playerName});
     }
 
     // reset the game or something
@@ -126,45 +141,44 @@ function FourDigits() {
     }
 
 
-
     // FUNCTIONS RELATED TO LOGIN PAGE
 
     // returns the login page html
     function LoginPage() {
-            return (
-                <div>
-                    <div className="container">
-                        <h1 style="text-align:center">Bulls and Cows</h1>
-                        <h2 style="text-align:center">Multiplayer Login</h2>
-                        <form>
-                            <fieldset>
-                                <label>Game ID</label>
-                                <input
-                                    type="text"
-                                    id="sourceText"
-                                    placeholder="roomtown123"
-                                    onChange={update_gamename}
-                                    required
-                                />
-                                <label>User ID</label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    placeholder="coolguy456"
-                                    onChange={update_username}
-                                    required
-                                />
-                                <input
-                                    type="submit"
-                                    onClick={login}
-                                    value="Login"
-                                />
-                            </fieldset>
-                        </form>
-                    </div>
+        return (
+            <div>
+                <div className="container">
+                    <h1 style="text-align:center">Bulls and Cows</h1>
+                    <h2 style="text-align:center">Multiplayer Login</h2>
+                    <form>
+                        <fieldset>
+                            <label>Game ID</label>
+                            <input
+                                type="text"
+                                id="sourceText"
+                                placeholder="roomtown123"
+                                onChange={update_gamename}
+                                required
+                            />
+                            <label>User ID</label>
+                            <input
+                                type="text"
+                                id="username"
+                                placeholder="coolguy456"
+                                onChange={update_username}
+                                required
+                            />
+                            <input
+                                type="submit"
+                                onClick={login}
+                                value="Login"
+                            />
+                        </fieldset>
+                    </form>
                 </div>
-            );
-        }
+            </div>
+        );
+    }
 
 
     // FUNCTIONS RELATED TO JOIN PAGE
@@ -196,7 +210,6 @@ function FourDigits() {
             </div>
         );
     }
-
 
 
     // FUNCTIONS RELATED TO WAITING PAGE
@@ -258,7 +271,6 @@ function FourDigits() {
     }
 
 
-
     // FUNCTIONS RELATED TO PLAYING PAGE
 
     // passes a turn
@@ -273,15 +285,15 @@ function FourDigits() {
         for (let i = 0; i < playerGuesses.p1.length; ++i) {
             guessesHints.push(
                 <tr>
-                    <td>{playerGuesses.p1[i]}<td>
-                    <td>{playerHints.p1[i]}<td>
-                    <td>{playerGuesses.p2[i]}<td>
-                    <td>{playerHints.p2[i]}<td>
-                    <td>{playerGuesses.p3[i]}<td>
-                    <td>{playerHints.p3[i]}<td>
-                    <td>{playerGuesses.p4[i]}<td>
-                    <td>{playerHints.p4[i]}<td>
-				</tr>
+                    <td>{playerGuesses.p1[i]}</td>
+                    <td>{playerHints.p1[i]}</td>
+                    <td>{playerGuesses.p2[i]}</td>
+                    <td>{playerHints.p2[i]}</td>
+                    <td>{playerGuesses.p3[i]}</td>
+                    <td>{playerHints.p3[i]}</td>
+                    <td>{playerGuesses.p4[i]}</td>
+                    <td>{playerHints.p4[i]}</td>
+                </tr>
             );
         }
 
@@ -289,7 +301,7 @@ function FourDigits() {
             <div>
                 <div className="container" style="text-align:center">
                     <h1>Bulls and Cows</h1>
-                    <h2>GO! Timer: </h2>//(https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>
+                    {/*<h2>GO! Timer: </h2>//(https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>*/}
                     <table>
                         <tr>
                             <th>{players[0]}</th>
@@ -351,5 +363,5 @@ function FourDigits() {
     return LoginPage();
 }
 
-
+export let gameName;
 export default FourDigits;

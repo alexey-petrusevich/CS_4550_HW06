@@ -1,14 +1,19 @@
 import {Socket} from "phoenix";
-import gameName from './FourDigits'
+import {gameName} from './FourDigits'
 
 let socket = new Socket(
     "/socket",
     {params: {token: ""}}
 );
+console.log("connecting to socket")
 socket.connect()
+console.log("socket connected")
 
 let gameVal = "game:" + gameName;
+console.log("gameVal: " + gameVal)
+console.log("requesting channel")
 let channel = socket.channel(gameVal, {})
+console.log("channel requested")
 
 let state = {
     playerGuesses: { p1: [], p2: [], p3: [], p4: [] },
@@ -32,11 +37,13 @@ function state_update(st) {
 }
 
 export function ch_join(cb) {
+    console.log("ch_join called")
     callback = cb;
     callback(state)
 }
 
 export function ch_login() {
+    console.log("ch_login called")
     channel.push("login", {})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -45,6 +52,7 @@ export function ch_login() {
 }
 
 export function ch_ready(playerName) {
+    console.log("ch_ready called")
     channel.push("ready", {playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -53,6 +61,7 @@ export function ch_ready(playerName) {
 }
 
 export function ch_join_as_observer() {
+    console.log("ch_join_as_observer called")
     channel.push("join_as_observer", {})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -61,6 +70,7 @@ export function ch_join_as_observer() {
 }
 
 export function ch_join_as_player(playerName) {
+    console.log("ch_join_as_player called")
     channel.push("join_as_player", {playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -77,6 +87,7 @@ export function ch_push(guess, playerName) {
 }
 
 export function ch_reset() {
+    console.log("ch_reset called")
     channel.push("reset", {})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -84,6 +95,7 @@ export function ch_reset() {
         });
 }
 
+console.log("calling join, gameName: " + gameName)
 
 channel.join()
     .receive("ok", state_update)
