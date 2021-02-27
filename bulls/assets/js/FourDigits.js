@@ -391,8 +391,10 @@ function FourDigits() {
   let body = null;
 
   function hasRoleSelected() {
-    return state.observerNames.includes(playerName)
+    let zzz = state.observerNames.includes(playerName)
         || state.playerNames.includes(playerName);
+    console.log("condition true? : " + zzz)
+    return zzz;
   }
 
   if (playerName.length === 0) {
