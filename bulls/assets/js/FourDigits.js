@@ -401,11 +401,11 @@ function FourDigits() {
 
   if (playerName.length === 0) {
     body = <LoginPage/>
-  } else if (state.gameState === "setUp") {
-    body = <JoinPage state={state}/>
   } else if ((state.gameState === "setUp" || state.gameState === "gameFull")
       && hasRoleSelected()) {
     body = <WaitingPage state={state}/>
+  } else if (state.gameState === "setUp") {
+    body = <JoinPage state={state}/>
   } else if (state.gameState === "playing") {
     body = <PlayPage st={state}/>
   } else {
