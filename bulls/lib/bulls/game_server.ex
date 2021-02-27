@@ -84,7 +84,7 @@ defmodule FourDigits.GameServer do
   # this is a wrapper method for GenServer.call -> :peek
   # actual listener is below
   def peek(gameName) do
-    IO.inspect("in GameServer.peek(), checking for gameName = " + gameName)
+    IO.inspect("in GameServer.peek(), checking for gameName = " <> gameName)
     GenServer.call(reg(gameName), {:peek, gameName})
   end
 
