@@ -169,17 +169,21 @@ defmodule FourDigits.Game do
   # marks himself as ready
   def toggleReady(gameState, playerName) do
     # get player atom (key) given playerName
+    IO.inspect("gettin player key")
     player = getPlayerAtom(gameState, playerName)
     # if the player doesn't exist, the game is over or in progress, do nothing
+    IO.inspect("inspecting player in Game.toggleReady()")
+    IO.inspect(player)
     if (player == nil
         || isGameOver(gameState)
         || isGameInProgress(gameState)) do
+      IO.inspect("player is nil -> return game state")
       # do nothing if either player not found, game over,
       # or game is progress
       gameState
     else
       # else update players ready
-      playersReady = %{gameState.playersReady | player: true}
+      playersReady Map.put(gameState.playersReady, player, true)
       # update game state with new players ready
       newState = %{gameState | playersReady: playersReady}
       # check if state change is required, and if so update state to :playing

@@ -119,6 +119,7 @@ defmodule FourDigits.GameServer do
 
   # handles reset call from GenServer.call
   def handle_call({:ready, gameName, playerName}, _from, gameState) do
+    IO.inspect("callning Game.toggleReady()")
     game = Game.toggleReady(gameState, playerName)
     BackupAgent.put(gameName, game)
     {:reply, game, game}
