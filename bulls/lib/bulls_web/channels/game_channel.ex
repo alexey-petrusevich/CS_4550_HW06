@@ -123,16 +123,15 @@ defmodule BullsWeb.GameChannel do
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
     IO.inspect("retrieved gamestate from gameserver")
+    IO.inspect(gameState)
     # if game is full or in set up state, find the player and mark him ready
     if (Game.isGameFull(gameState)
         || Game.isGameInSetUp(gameState)) do
       # retrieve saved game name from the socket
       # and mark it as ready
-      IO.inspect("game is full or in setup mode, toggling ready")
       view = socket.assigns[:gameName]
              |> GameServer.toggleReady(playerName)
              |> Game.view()
-      IO.inspect("toggled and retrieved view")
       # broadcast the view to everyone connected to the socket
       broadcast(socket, "view", view)
       # send a reply with the view to the caller
