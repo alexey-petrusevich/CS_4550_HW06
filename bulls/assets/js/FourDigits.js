@@ -96,6 +96,7 @@ function WaitingPage({state}) {
   }
 
   function makeReady() {
+    console.log("creating header in makeReady")
     let readyList = [];
 
     readyList.push(
@@ -115,6 +116,8 @@ function WaitingPage({state}) {
         </div>
     );
 
+    console.log("pushing ifReady in makeReady")
+
     readyList.push(
         <div className="row">
           <div className="column">
@@ -132,9 +135,11 @@ function WaitingPage({state}) {
         </div>
     );
 
+    console.log("returning makeReady")
     return readyList;
   }
 
+  console.log("returning the whole Waiting Container")
   return (
       <div className="container">
         <div className="row">
