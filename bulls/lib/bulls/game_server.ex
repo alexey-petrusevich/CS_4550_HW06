@@ -41,6 +41,7 @@ defmodule FourDigits.GameServer do
     IO.inspect("in GameServer start_link method")
     IO.inspect("about to create or look up new game")
     game = BackupAgent.get(gameName) || Game.new(gameName)
+    BackupAgent.put(gameName, game)
     IO.inspect("game after checking BA or calling new")
     IO.inspect(game)
     # start the server with the game state
