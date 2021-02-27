@@ -248,6 +248,12 @@ defmodule FourDigits.Game do
   # if playerNa,e nt found returns nil
   def getPlayerAtomHelp(mapKeys, map, playerName) do
     IO.inspect("in getPlayerAtomHelp")
+    IO.inspect("mapKeys")
+    IO.inspect(mapKeys)
+    IO.inspect("map")
+    IO.inspect(map)
+    IO.inspect("playerName")
+    IO.inspect(playerName)
     if (length(mapKeys) == 0) do
       # if here, playerName somehow not found in the map
       IO.inspect("player name not found????")
