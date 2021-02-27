@@ -14,16 +14,26 @@ defmodule BullsWeb.GameChannel do
     IO.inspect("join called")
 
     GameServer.start(gameName)
+
+    IO.inspect("started GenServer")
     # create new socket, and store game name in the socket
     socket = socket
              |> assign(:gameName, gameName)
+    IO.inspect("stored game name in the socket")
+
     # get state of the game from the server (process)
     # here the game should be fresh - no guesses made
     # or the current game game
+
     gameState = GameServer.peek(gameName)
+    IO.inspect("retrieved game state from the dynamic supervisor")
+    IO.inspect(gameState)
+
     # truncate any secret info and reveal only what is necessary
     # to the caller
     view = Game.view(gameState)
+    IO.inspect("obtained view from the model")
+    IO.inspect(view)
     # return view back to the caller
     {:ok, view, socket}
   end
