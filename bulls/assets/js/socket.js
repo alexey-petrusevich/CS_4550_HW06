@@ -26,6 +26,8 @@ let callback = null;
 
 function state_update(st) {
   console.log("New State", st);
+  console.log("type of state? " + (typeof st))
+  console.log("type of map? " + (typeof st.wins))
   state = st;
   if (callback) {
     callback(st);

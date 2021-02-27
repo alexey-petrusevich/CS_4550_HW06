@@ -374,7 +374,7 @@ function GameOver({state}) {
 function FourDigits() {
 
   const [state, setState] = useState({
-    playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
+    playerGuesses: new Map(),
     playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
     playerNames: [],
     observerNames: [],
