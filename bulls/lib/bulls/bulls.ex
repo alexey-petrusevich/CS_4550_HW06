@@ -186,6 +186,8 @@ defmodule FourDigits.Game do
       playersReady = Map.put(gameState.playersReady, player, true)
       # update game state with new players ready
       newState = %{gameState | playersReady: playersReady}
+      IO.inspect("state updated in model")
+      IO.inspect(newState)
       # check if state change is required, and if so update state to :playing
       # (if every player is ready)
       if (isAllReady(newState, newState.playerNames)) do
