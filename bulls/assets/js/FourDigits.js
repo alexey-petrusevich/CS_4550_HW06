@@ -87,8 +87,7 @@ function JoinPage({state}) {
 function WaitingPage({state}) {
 
   function isObserver() {
-    let playerNames = state.playerNames;
-    return playerNames.includes(playerName);
+    return state.observerNames.includes(playerName);
   }
 
   function ready() {
