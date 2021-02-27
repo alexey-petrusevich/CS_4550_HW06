@@ -94,7 +94,6 @@ function WaitingPage({state}) {
     ch_ready(playerName, gameName);
   }
 
-  console.log("returning the whole Waiting Container")
   return (
       <div className="container">
         <div className="row">
@@ -371,16 +370,12 @@ function FourDigits() {
     ch_join(setState)
   })
 
-  let body = null;
+  let body;
 
   function hasRoleSelected() {
-    let zzz = state.observerNames.includes(playerName)
+    return state.observerNames.includes(playerName)
         || state.playerNames.includes(playerName);
-    console.log("condition true? : " + zzz)
-    return zzz;
   }
-
-  console.log("game state = " + state.gameState)
 
   if (playerName.length === 0) {
     body = <LoginPage/>

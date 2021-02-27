@@ -32,7 +32,7 @@ function state_update(st) {
 }
 
 export function ch_join(cb) {
-  console.log("ch_join called")
+  // console.log("ch_join called")
   callback = cb;
   callback(state)
 }
@@ -73,6 +73,7 @@ export function ch_ready(playerName, gameName) {
   .receive("error", resp => {
     console.log("unable to select ready", resp)
   });
+  console.log("state updated in ch_ready: " + state)
 }
 
 export function ch_join_as_observer(observerName, gameName) {
