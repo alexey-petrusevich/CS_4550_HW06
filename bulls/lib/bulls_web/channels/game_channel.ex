@@ -11,29 +11,17 @@ defmodule BullsWeb.GameChannel do
     # start game server (a.k.a. initialize new game when joined)
     # this would not start a duplicate server - all the keys in corresponding
     # Registry are unique
-    IO.inspect("join called")
-
     GameServer.start(gameName)
-
-    IO.inspect("started GenServer")
     # create new socket, and store game name in the socket
     socket = socket
              |> assign(:gameName, gameName)
-    IO.inspect("stored game name in the socket")
-
     # get state of the game from the server (process)
     # here the game should be fresh - no guesses made
     # or the current game game
-
     gameState = GameServer.peek(gameName)
-    IO.inspect("retrieved game state from the dynamic supervisor")
-    IO.inspect(gameState)
-
     # truncate any secret info and reveal only what is necessary
     # to the caller
     view = Game.view(gameState)
-    IO.inspect("obtained view from the model")
-    IO.inspect(view)
     # return view back to the caller
     {:ok, view, socket}
   end
@@ -67,12 +55,18 @@ defmodule BullsWeb.GameChannel do
     # retrieve game from the game server
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
+    IO.inspect("retrieved game from the game server")
+    IO.inspect(gameState)
     # if the game is still in set up mode, join the game as player
     if (Game.isGameInSetUp(gameState)) do
       # update the game with new player
+      IO.inspect("updating join")
       gameState = Game.updateJoin(gameState, playerName)
+      IO.inspect("updated join successfully")
+      IO.inspect(gameState)
       # truncate any sensitive info
       view = Game.view(gameState)
+      IO.inspect("truncated gamestate")
       {:reply, {:ok, view}, socket}
     else
       # else game is full, in progress, or game over
