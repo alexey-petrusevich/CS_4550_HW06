@@ -169,7 +169,7 @@ defmodule FourDigits.Game do
   # marks himself as ready
   def toggleReady(gameState, playerName) do
     # get player atom (key) given playerName
-    IO.inspect("gettin player key")
+    IO.inspect("getting player key for player: " <> playerName)
     player = getPlayerAtom(gameState, playerName)
     # if the player doesn't exist, the game is over or in progress, do nothing
     IO.inspect("inspecting player in Game.toggleReady()")
@@ -252,7 +252,6 @@ defmodule FourDigits.Game do
   # value in the map
   def getPlayerAtom(gameState, playerName) do
     # get all the keys from playerMap (p1, p2, p3, p4)
-    IO.inspect("getting keys from player map")
     mapKeys = Map.keys(gameState.playerMap) # p1, p2, p3, p4
     IO.inspect("got the keys from players map")
     IO.inspect(mapKeys)
