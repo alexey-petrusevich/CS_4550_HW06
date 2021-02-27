@@ -11,6 +11,8 @@ defmodule BullsWeb.GameChannel do
     # start game server (a.k.a. initialize new game when joined)
     # this would not start a duplicate server - all the keys in corresponding
     # Registry are unique
+    IO.inspect("join called")
+
     GameServer.start(gameName)
     # create new socket, and store game name in the socket
     socket = socket

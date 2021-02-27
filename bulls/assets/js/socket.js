@@ -45,7 +45,7 @@ function updateChannel(gameName) {
   .receive("ok", state_update)
   .receive("error", resp => {
     console.log("Unable to join to channel", resp)
-  })
+  });
   console.log("state received from calling join to the server: " + state)
   channel.on("view", state_update(state));
 }
