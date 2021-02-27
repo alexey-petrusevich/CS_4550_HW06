@@ -114,7 +114,9 @@ function WaitingPage({state}) {
           </div>
         </div>
     );
-    // let map = state.playersReady;
+    console.log("state: " + state)
+    console.log("playersRead: " + state.playersReady)
+    let playersReady = state.playersReady;
     // let mapKeys = Array.from(map.keys());
 
     readyList.push(
