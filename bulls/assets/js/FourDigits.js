@@ -6,6 +6,7 @@ import {ch_push, ch_join, ch_reset, ch_login, ch_ready, ch_join_as_player, ch_jo
 
 
 function FourDigits() {
+    // given states
     const [state, setState] = useState({
         playerGuesses: { p1: [], p2: [], p3: [], p4: [] },
         playerHints: { p1: [], p2: [], p3: [], p4: [] },
@@ -16,7 +17,7 @@ function FourDigits() {
         gameState: "",
         status: ""
     });
-    // for textfield
+    // local states
     const [guess, setGuess] = useState("");
     const [gameName, setGameName] = useState("");
     export default gameName;
@@ -24,19 +25,12 @@ function FourDigits() {
     const [isGameFull, setIsGameFull] = useState(false);
     const [isUserObserver, setIsUserObserver] = useState(false);
 
+    let { playerGuesses, playerHints, playerNames, winners, wins, losses, gameState, status } = gameState;
 
-    // TODO: add exit button to playing screen
-    // TODO (NOTE): if a player leaves the game at any moment, he is considered AFK and the game
-    // TODO (NOTE): as if the player is still in the game but subimts passes
-    // TODO: add reset button on the playing page
-    // TODO: add wins/losses statistics to the setup page
-
-    let { playerGuesses, playerHints, playerNames, gameName, gameState } = gameState;
 
     useEffect(() => {
         ch_join(setState)
     })
-
 
 
     // IF STATEMENTS THAT DIRECTLY UPDATE STATE
@@ -226,29 +220,29 @@ function FourDigits() {
                         <tr>
                             <td>1</td>
                             <td>{players[0]}</td>
-                            <td></td>
-                            <td></td>
+                            <td>wins[playerNames[0]]</td>
+                            <td>losses[playerNames[0]]</td>
                             <td>{ready[0]}</td>
                         </tr>
                         <tr>
                             <td>2</td>
                             <td>{players[1]}</td>
-                            <td></td>
-                            <td></td>
+                            <td>wins[playerNames[1]]</td>
+                            <td>losses[playerNames[1]]</td>
                             <td>{ready[1]}</td>
                         </tr>
                         <tr>
                             <td>3</td>
                             <td>{players[2]}</td>
-                            <td></td>
-                            <td></td>
+                            <td>wins[playerNames[2]</td>
+                            <td>losses[playerNames[2]]</td>
                             <td>{ready[2]}</td>
                         </tr>
                         <tr>
                             <td>4</td>
                             <td>{players[3]}</td>
-                            <td></td>
-                            <td></td>
+                            <td>wins[playerNames[3]]</td>
+                            <td>losses[playerNames[3]]</td>
                             <td>{ready[3]}</td>
                         </tr>
                     </table>
@@ -269,7 +263,7 @@ function FourDigits() {
 
     // passes a turn
     function pass() {
-        setGuess("    ");
+        setGuess("");
         make_guess();
     }
 
@@ -339,12 +333,22 @@ function FourDigits() {
                         value="Pass"
                         disabled={isUserObserver}
                     />
+                    <input
+                        type="button"
+                        onClick={LoginPage}
+                        value="Leave Game"
+                    />
+                    <input
+                        type="button"
+                        onClick={reset}
+                        value="Reset Game"
+                    />
                 </div>
             </div>
         );
     }
 
-
+    return LoginPage();
 }
 
 

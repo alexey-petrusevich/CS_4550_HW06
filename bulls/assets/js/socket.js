@@ -11,11 +11,14 @@ let gameVal = "game:" + gameName;
 let channel = socket.channel(gameVal, {})
 
 let state = {
-    playerGuesses: {p1: [], p2: {}, p3: [], p4: []},
-    playerHints: {p1: [], p2: {}, p3: [], p4: []},
+    playerGuesses: { p1: [], p2: [], p3: [], p4: [] },
+    playerHints: { p1: [], p2: [], p3: [], p4: [] },
     playerNames: [],
-    gameName: "",
-    gameState: ""
+    winners: {},
+    wins: {},
+    losses: {},
+    gameState: "",
+    status: ""
 }
 
 let callback = null;
@@ -50,7 +53,7 @@ export function ch_ready(playerName) {
 }
 
 export function ch_join_as_observer() {
-    channel.push("ch_join_as_observer", {})
+    channel.push("join_as_observer", {})
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to join as observer", resp)
@@ -81,8 +84,6 @@ export function ch_reset() {
         });
 }
 
-// TODO: add endpoint for returning wins and losses to the caller
-// TODO: like ch_get_wins_losses????
 
 channel.join()
     .receive("ok", state_update)
