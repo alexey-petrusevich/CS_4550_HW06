@@ -95,50 +95,6 @@ function WaitingPage({state}) {
     ch_ready(playerName, gameName);
   }
 
-  function makeReady() {
-    console.log("creating header in makeReady")
-    let readyList = [];
-
-    readyList.push(
-        <div className="row">
-          <div className="column">
-            Player 1
-          </div>
-          <div className="column">
-            Player 2
-          </div>
-          <div className="column">
-            Player 3
-          </div>
-          <div className="column">
-            Player 4
-          </div>
-        </div>
-    );
-
-    console.log("pushing ifReady in makeReady")
-
-    readyList.push(
-        <div className="row">
-          <div className="column">
-            {state.playersReady.p1}
-          </div>
-          <div className="column">
-            {state.playersReady.p2}
-          </div>
-          <div className="column">
-            {state.playersReady.p3}
-          </div>
-          <div className="column">
-            {state.playersReady.p4}
-          </div>
-        </div>
-    );
-
-    console.log("returning makeReady")
-    return readyList;
-  }
-
   console.log("returning the whole Waiting Container")
   return (
       <div className="container">
@@ -147,7 +103,34 @@ function WaitingPage({state}) {
             <h1>Bulls and Cows</h1>
             <h2>Waiting on Players</h2>
             <button onClick={ready} disabled={isObserver()}>Ready</button>
-            {makeReady()}
+            <div className="row">
+              <div className="column">
+                Player 1
+              </div>
+              <div className="column">
+                Player 2
+              </div>
+              <div className="column">
+                Player 3
+              </div>
+              <div className="column">
+                Player 4
+              </div>
+            </div>
+            <div className="row">
+              <div className="column">
+                {state.playersReady.p1}
+              </div>
+              <div className="column">
+                {state.playersReady.p2}
+              </div>
+              <div className="column">
+                {state.playersReady.p3}
+              </div>
+              <div className="column">
+                {state.playersReady.p4}
+              </div>
+            </div>
           </div>
         </div>
       </div>
