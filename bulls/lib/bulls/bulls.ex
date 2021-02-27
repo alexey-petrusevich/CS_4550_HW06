@@ -113,9 +113,9 @@ defmodule FourDigits.Game do
   # adds a given playerName to the playerMap
   def addToPlayerMap(gameState, playerName) do
     # get player atom (key) given playerName
-    IO.inspect("calling getPlayerAtom")
-    player = getPlayerAtom(gameState, playerName)
-    IO.inspect("player with name " <> playerName <> " has key " <> player)
+#    IO.inspect("calling getPlayerAtom")
+#    player = getPlayerAtom(gameState, playerName)
+#    IO.inspect("player with name " <> playerName <> " has key " <> player)
     # get all the ksy from the player map (e.g. p1, p2, p3, p4)
     IO.inspect("getting all the keys from gameState.playerMap")
     keys = Map.keys(gameState.playerMap)
@@ -136,7 +136,7 @@ defmodule FourDigits.Game do
     else
     IO.inspect("keys is not empty")
       # else there are still spots left - > check if this spot is empty
-      if (Map.get(gameState.playerMap, hd(keys)) == nil) do
+      if (Map.get(gameState.playerMap, hd(keys)) == "") do
         IO.inspect("find empty spot for new player")
         # found empty spot - add playerName
         newPlayerMap = Map.put(gameState.playerMap, hd(keys), playerName)
