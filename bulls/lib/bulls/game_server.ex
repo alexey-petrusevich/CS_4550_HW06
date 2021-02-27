@@ -42,6 +42,7 @@ defmodule FourDigits.GameServer do
     IO.inspect("about to create or look up new game")
     game = BackupAgent.get(gameName) || Game.new(gameName)
     IO.inspect("game after checking BA or calling new")
+    IO.inspect(game)
     # start the server with the game state
     # if the server has failed somehow, it will restart
     # with the game retrieved from the BackupAgent
