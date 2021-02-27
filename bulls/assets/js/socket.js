@@ -13,6 +13,7 @@ let state = {
   playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
   playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
   playerNames: [],
+  playersReady: new Map([["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
   wins: new Map(),
   losses: new Map(),
   gameState: "",

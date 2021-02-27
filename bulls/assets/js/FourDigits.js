@@ -95,6 +95,210 @@ function WaitingPage({state}) {
     ch_ready(playerName, gameName);
   }
 
+  function makeReady() {
+    let readyList = [];
+
+    readyList.push(
+        <div className="row">
+          <div className="column">
+            Player 1
+          </div>
+          <div className="column">
+            Player 2
+          </div>
+          <div className="column">
+            Player 3
+          </div>
+          <div className="column">
+            Player 4
+          </div>
+        </div>
+    );
+
+    let mapKeys = Array.from(state.playersReady.keys());
+
+    readyList.push(
+        <div className="row">
+          <div className="column">
+            {state.playersReady.get(mapKeys[0])}
+          </div>
+          <div className="column">
+            {state.playersReady.get(mapKeys[1])}
+          </div>
+          <div className="column">
+            {state.playersReady.get(mapKeys[2])}
+          </div>
+          <div className="column">
+            {state.playersReady.get(mapKeys[3])}
+          </div>
+        </div>
+    );
+
+    return readyList;
+  }
+
+  return (
+      <div className="container">
+        <div className="row">
+          <div className="column">
+            <h1>Bulls and Cows</h1>
+            <h2>Waiting on Players</h2>
+            <button onClick={ready} disabled={isObserver()}>Ready</button>
+            {makeReady()}
+          </div>
+        </div>
+      </div>
+  );
+}
+
+// returns play page with guesses and make guess buttons
+function PlayPage({st}) {
+
+  let {playerGuesses, playerHints, status} = st;
+
+  // for text field
+  const [guess, setGuess] = useState("");
+
+  function isGameOver() {
+    return status === "gameOver";
+  }
+
+  function updateGuess(ev) {
+    if (!isGameOver()) {
+      let text = ev.target.value;
+      let fieldLength = text.length;
+      if (fieldLength > 4) {
+        text = text.substr(0, 4);
+      }
+      setGuess(text);
+    }
+  }
+
+  function makeGuess() {
+    if (!isGameOver()) {
+      ch_push({guess: guess});
+    }
+  }
+
+  function keypress(ev) {
+    if (!isGameOver() && ev.key === "Enter") {
+      makeGuess();
+    }
+  }
+
+  function reset() {
+    ch_reset();
+  }
+
+  return (
+      <div>
+        <div className="row">
+          <div className="column">
+            <p>
+              <input type="text"
+                     onChange={updateGuess}
+                     value={guess}
+                     onKeyPress={keypress}
+              />
+            </p>
+          </div>
+          <div className="column">
+            <p>
+              <button onClick={makeGuess}>Guess</button>
+              <button onClick={reset}>Reset</button>
+            </p>
+          </div>
+        </div>
+        <ResultTable guesses={playerGuesses} hints={playerHints}/>
+        <StatusBar status={status}/>
+      </div>
+  );
+
+  function ResultTable({guessesMap, hintsMap}) {
+    let mapKeys = Array.from(guessesMap.keys()); // [p1, p2, p3, p4]
+    let numEntries = guessesMap.get(mapKeys[0]).length;
+
+    function pushHeader() {
+      let guessesHints = []
+      // push empty column for turn number
+      guessesHints.push(
+          <div className="column">
+            <p>Num Guesses</p>
+          </div>
+      );
+      for (let i = 0; i < 4; ++i) {
+        guessesHints.push(
+            <div className="column">
+              <p>
+                Player {i + 1} Guesses
+              </p>
+            </div>
+        );
+        guessesHints.push(
+            <div className="column">
+              <p>
+                Player {i + 1} Hints
+              </p>
+            </div>
+        );
+      }
+      return guessesHints;
+    }
+
+    function pushColumn(value) {
+      return (
+          <div className="column">
+            <p>{value}</p>
+          </div>
+      );
+    }
+
+    // get header
+    let guessesHints = pushHeader();
+
+    // push all guesses and hints
+    for (let i = 0; i < numEntries; ++i) {
+      guessesHints.push(
+          <div className="row">
+            <div className="column">
+              <p>{i + 1}</p>
+            </div>
+            {pushColumn(guessesMap.get(mapKeys[0])[i])}
+            {pushColumn(hintsMap.get(mapKeys[0])[i])}
+            {pushColumn(guessesMap.get(mapKeys[1])[i])}
+            {pushColumn(hintsMap.get(mapKeys[1])[i])}
+            {pushColumn(guessesMap.get(mapKeys[2])[i])}
+            {pushColumn(hintsMap.get(mapKeys[2])[i])}
+            {pushColumn(guessesMap.get(mapKeys[3])[i])}
+            {pushColumn(hintsMap.get(mapKeys[3])[i])}
+          </div>
+      );
+    }
+
+    return (
+        <div>
+          {guessesHints}
+        </div>
+    );
+  }
+
+  function StatusBar({status}) {
+    return (
+        <div>
+          <div className="row">
+            <div className="column">
+              <p>
+                {status}
+              </p>
+            </div>
+          </div>
+        </div>
+    );
+  }
+}
+
+// return game over screen with statistics and reset button
+function GameOver({state}) {
   function makeStatistics() {
     let winsLosses = [];
     let wins = state.wins;
@@ -148,51 +352,18 @@ function WaitingPage({state}) {
 
   let winsLosses = makeStatistics();
 
-  return (
-      <div className="row">
-        <div className="column">
-          <h1>Bulls and Cows</h1>
-          <h2>Waiting on Players</h2>
-          <button onClick={ready} disabled={isObserver()}>Ready</button>
-          {winsLosses}
-        </div>
-      </div>
-  );
-}
-
-// TODO: change -> taken from hangman
-function Play({state}) {
-  let {name, word, guesses} = state;
-
-  let view = word.split('');
-  let bads = [];
-
-  function guess(newGuess) {
-    // Inner function isn't a render function
-    ch_push({guess: newGuess});
-  }
-
   function reset() {
-    console.log("FourDigits.reset() called");
-    ch_reset();
+    ch_reset(gameName)
   }
 
   return (
       <div>
         <div className="row">
           <div className="column">
-            <p>Word: {view.join(' ')}</p>
-          </div>
-          <div className="column">
-            <p>Name: {name}</p>
+            <button onClick={reset}>Reset</button>
+            {winsLosses}
           </div>
         </div>
-        <div className="row">
-          <div className="column">
-            <p>Guesses: {guesses.join(' ')}</p>
-          </div>
-        </div>
-        <Controls reset={reset} guess={guess}/>
       </div>
   );
 }
@@ -200,313 +371,42 @@ function Play({state}) {
 // this component gets passed to the "root"
 function FourDigits() {
 
+  const [state, setState] = useState({
+    playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
+    playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
+    playerNames: [],
+    playersReady: new Map(
+        [["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
+    wins: new Map(),
+    losses: new Map(),
+    gameState: "",
+    status: ""
+  });
+
+  useEffect(() => {
+    ch_join(setState)
+  })
+
   let body;
-  //
-  // console.log("started four digits")
-  // // given states
-  // const [state, setState] = useState({
-  //     playerGuesses: {p1: [], p2: [], p3: [], p4: []},
-  //     playerHints: {p1: [], p2: [], p3: [], p4: []},
-  //     playerNames: [],
-  //     winners: {},
-  //     wins: {},
-  //     losses: {},
-  //     gameState: "",
-  //     status: ""
-  // });
-  // // local states
-  // const [guess, setGuess] = useState("");
-  const [gameName, setGameName] = useState("");
-  const [playerName, setPlayerName] = useState("");
-  // const [isGameFull, setIsGameFull] = useState(false);
-  // const [isUserObserver, setIsUserObserver] = useState(false);
-  //
-  // let {
-  //     playerGuesses,
-  //     playerHints,
-  //     playerNames,
-  //     winners,
-  //     wins,
-  //     losses,
-  //     gameState,
-  //     status
-  // } = gameState;
-  //
-  //
-  // useEffect(() => {
-  //     ch_join(setState)
-  // })
 
-  //
-  // // IF STATEMENTS THAT DIRECTLY UPDATE STATE
-  //
-  // // check if game is full to update elements
-  // if (gameState === "gameFull") {
-  //     setIsGameFull(true);
-  // } else {
-  //     setIsGameFull(false);
-  // }
-  //
-  // // check if user is a player to update elements
-  // if (playerNames.includes(playerName)) {
-  //     setIsUserObserver(false);
-  // } else {
-  //     setIsUserObserver(true);
-  // }
-  //
-  //
-  // // FUNCTIONS THAT DIRECTLY UPDATE STATE
-  //
-  // // updates the guess state
-  // function update_guess(input) {
-  //     setGuess(input.target.value)
-  // }
-  //
-  // updates the playerName state
-  function update_playername(input) {
-    setPlayerName(input.target.value)
+  if (playerName.length === 0) {
+    body = <LoginPage/>
+  } else if (state.gameState === "setUp") {
+    body = <JoinPage state={state}/>
+  } else if (state.gameState === "gameFull") {
+    body = <WaitingPage state={state}/>
+  } else if (state.gameState === "playing") {
+    body = <PlayPage st={state}/>
+  } else {
+    body = <GameOver state={state}/>
   }
-
-  //
-  // updates the gameName state
-  function update_gamename(input) {
-    setGameName(input.target.value)
-  }
-
-  // FUNCTIONS THAT COMMUNICATE CHANGES TO THE CHANNEL
-
-  // calls ch_login to get game information
-  function login() {
-    console.log("login() called")
-    body = <JoinPage/>
-    console.log("body changed to join")
-    // ch_login({gameName: gameName});
-
-    // if (gameState === "setUp" || gameState === "gameFull" || gameState === "gameOver") {
-    //     return (
-    //         <JoinPage/>
-    //     );
-    // }
-    //
-    // if (gameState === "playing") {
-    //     if (playerNames.includes(playerName)) {
-    //         return (
-    //             <PlayingPage/>
-    //         );
-    //
-    //     } else {
-    //         ch_join_as_observer({gameName: gameName});
-    //         return (
-    //             <PlayingPage/>
-    //         );
-    //
-    //     }
-    // }
-  }
-
-  //
-  // // marks a player as ready
-  // function ready() {
-  //     ch_ready({playerName: playerName, gameName: gameName});
-  // }
-  //
-  // // user joins game as observer
-  // function join_as_observer() {
-  //     ch_join_as_observer({gameName: gameName});
-  //
-  //     if (gameState === "setUp" || gameState === "gameFull" || gameState === "gameOver") {
-  //         WaitingPage();
-  //     }
-  //
-  //     if (gameState === "playing") {
-  //         PlayingPage();
-  //     }
-  // }
-  //
-  // // user joins game as player
-  // function join_as_player() {
-  //     ch_join_as_player({playerName: playerName, gameName: gameName});
-  //     WaitingPage();
-  // }
-  //
-  // // user makes guess
-  // function make_guess() {
-  //     ch_push({guess: guess, playerName: playerName, gameName: gameName});
-  // }
-  //
-  // // reset the game or something
-  // function reset() {
-  //     console.log("game reset");
-  //     ch_reset({gameName: gameName});
-  // }
-
-  // FUNCTIONS RELATED TO LOGIN PAGE
-
-  // returns the login page html
-
-  //
-  //
-  // FUNCTIONS RELATED TO JOIN PAGE
-
-  // returns the join page html
-
-  //
-  //
-  // // FUNCTIONS RELATED TO WAITING PAGE
-  //
-  // returns the waiting page html
-  function WaitingPage({players, ready}) {
-    return (
-        <div>
-          <div className="container" style="text-align:center">
-            <h1>Bulls and Cows</h1>
-            <h2>Waiting on Players</h2>
-            <h3>Last rounds winners: {winners}</h3>
-            <table>
-              <tr>
-                <th>Player:</th>
-                <th>Name:</th>
-                <th>Wins:</th>
-                <th>Losses:</th>
-                <th>Ready?</th>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>{players[0]}</td>
-                <td>wins[playerNames[0]]</td>
-                <td>losses[playerNames[0]]</td>
-                <td>{ready[0]}</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>{players[1]}</td>
-                <td>wins[playerNames[1]]</td>
-                <td>losses[playerNames[1]]</td>
-                <td>{ready[1]}</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>{players[2]}</td>
-                <td>wins[playerNames[2]</td>
-                <td>losses[playerNames[2]]</td>
-                <td>{ready[2]}</td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>{players[3]}</td>
-                <td>wins[playerNames[3]]</td>
-                <td>losses[playerNames[3]]</td>
-                <td>{ready[3]}</td>
-              </tr>
-            </table>
-            <input
-                type="submit"
-                onClick={ready}
-                value="Ready"
-                disabled={isUserObserver}
-            />
-          </div>
-        </div>
-    );
-  }
-
-  //
-  // // FUNCTIONS RELATED TO PLAYING PAGE
-  //
-  // // passes a turn
-  // function pass() {
-  //     setGuess("");
-  //     make_guess();
-  // }
-  //
-  // // returns the playing page html
-  // function PlayingPage() {
-  //     let guessesHints = [];
-  //     for (let i = 0; i < playerGuesses.p1.length; ++i) {
-  //         guessesHints.push(
-  //             <tr>
-  //                 <td>{playerGuesses.p1[i]}</td>
-  //                 <td>{playerHints.p1[i]}</td>
-  //                 <td>{playerGuesses.p2[i]}</td>
-  //                 <td>{playerHints.p2[i]}</td>
-  //                 <td>{playerGuesses.p3[i]}</td>
-  //                 <td>{playerHints.p3[i]}</td>
-  //                 <td>{playerGuesses.p4[i]}</td>
-  //                 <td>{playerHints.p4[i]}</td>
-  //             </tr>
-  //         );
-  //     }
-  //
-  //     return (
-  //         <div>
-  //             <div className="container" style="text-align:center">
-  //                 <h1>Bulls and Cows</h1>
-  //                 {/*<h2>GO! Timer: </h2>//(https://www.w3schools.com/howto/howto_js_countdown.asp)</h2>*/}
-  //                 <table>
-  //                     <tr>
-  //                         <th>{players[0]}</th>
-  //                         <th/>
-  //                         <th>{players[1]}</th>
-  //                         <th/>
-  //                         <th>{players[2]}</th>
-  //                         <th/>
-  //                         <th>{players[3]}</th>
-  //                         <th/>
-  //                     </tr>
-  //                     <tr>
-  //                         <th>Guess:</th>
-  //                         <th>Hint:</th>
-  //                         <th>Guess:</th>
-  //                         <th>Hint:</th>
-  //                         <th>Guess:</th>
-  //                         <th>Hint:</th>
-  //                         <th>Guess:</th>
-  //                         <th>Hint:</th>
-  //                     </tr>
-  //                     {guessesHints}
-  //                 </table>
-  //                 <input
-  //                     type="text"
-  //                     onChange={update_guess}
-  //                     placeholder="####"
-  //                     maxLength="4"
-  //                     minLength="4"
-  //                     disabled={isUserObserver}
-  //                 />
-  //                 <input
-  //                     type="submit"
-  //                     onClick={make_guess}
-  //                     value="Submit Guess"
-  //                     disabled={isUserObserver}
-  //                 />
-  //                 <input
-  //                     type="submit"
-  //                     onClick={pass}
-  //                     value="Pass"
-  //                     disabled={isUserObserver}
-  //                 />
-  //                 <input
-  //                     type="button"
-  //                     onClick={LoginPage}
-  //                     value="Leave Game"
-  //                 />
-  //                 <input
-  //                     type="button"
-  //                     onClick={reset}
-  //                     value="Reset Game"
-  //                 />
-  //             </div>
-  //         </div>
-  //     );
-  // }
-
-  body = <LoginPage/>
 
   return (
       <div className="container">
         {body}
       </div>
   );
+
 }
 
 export default FourDigits;
