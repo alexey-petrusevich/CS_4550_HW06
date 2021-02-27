@@ -27,6 +27,8 @@ defmodule FourDigits.GameServer do
     # here child represents a new game
     # returns {:ok, pid}
     # spec is the list of parameters for starting child process
+    IO.inspect("in GameServer passing spec to GameSupervisor.start_child")
+    IO.inspect(spec)
     FourDigits.GameSupervisor.start_child(spec)
   end
 
@@ -36,7 +38,10 @@ defmodule FourDigits.GameServer do
     # check if the game has been saved in the backup agent
     # the backup agent has already been started by the main thread
     # BackupAgent is shared between all the games
+    IO.inspect("in GameServer start_link method")
+    IO.inspect("about to create or look up new game")
     game = BackupAgent.get(gameName) || Game.new(gameName)
+    IO.inspect("game after checking BA or calling new")
     # start the server with the game state
     # if the server has failed somehow, it will restart
     # with the game retrieved from the BackupAgent
@@ -128,7 +133,10 @@ defmodule FourDigits.GameServer do
   # for the callers
   def handle_call({:peek, gameName}, _from, gameState) do
     # get the game state from the backup agent
+    IO.inspect("checking backup agent for the game state")
     game = BackupAgent.get(gameName)
+    IO.inspect("gameState retrieved from backup agent: ")
+    IO.inspect(game)
     # return the game state to the caller
     {:reply, game, game}
   end
