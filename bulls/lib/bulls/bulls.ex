@@ -54,20 +54,21 @@ defmodule FourDigits.Game do
 
   # updates given game state with a new user joins
   def updateJoin(gameState, playerName) do
-    if (gameState.gameState == :playing
-        || isGameFull(gameState)) do
-      # game in progress or full - no update
+    # if the game is full or is playing
+    if (!isGameInSetUp(gameState)) do
+      # game is not un set up state - no update
       gameState
     else
       # else add new player
       # add player to the list of playerNames
       playerNames = gameState.playerNames ++ [playerName]
+      # create new state wth new list of playerNames
       newState = %{gameState | playerNames: playerNames}
       # add player to the playerMap
       newState = addToPlayerMap(newState, playerName)
       # add player to wins and losses (if not present)
       newState = addToWinsLosses(newState, playerName)
-      # check if the game is full
+      # check if the game is full, and update game state if so
       if (isGameFull(newState)) do
         # game is full, update game state
         %{newState | gameState: :gameFull}
@@ -78,23 +79,30 @@ defmodule FourDigits.Game do
     end
   end
 
+
   # adds new player to the wins and losses maps
   # if player is already there, returns original gameState
   # assumes that both or neither wins and losses have the player
   def addToWinsLosses(gameState, playerName) do
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
+    # get wins maps
     wins = gameState.wins
+    # get losses map
     losses = gameState.losses
+    # if there's no entry for the given player, add this player to the map of
+    # wins and losses
     if (Map.get(wins, player) == nil) do
-      # add new entry
+      # add new entry to wins
       wins = Map.put(wins, playerName, 0)
+      # add new entry to losses
       losses = Map.put(losses, playerName, 0)
-      newSate = %{gameState | wins: wins}
-      newState = %{newState | losses: losses}
-      newState
+      # update state with wins
+      newState = %{gameState | wins: wins}
+      # update state win losses and return
+      %{newState | losses: losses}
     else
-      # else return original game state
+      # else player is already in the wins and losses map - return original game state
       gameState
     end
   end
@@ -104,19 +112,27 @@ defmodule FourDigits.Game do
   def addToPlayerMap(gameState, playerName) do
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
+    # get all the ksy from the player map (e.g. p1, p2, p3, p4)
     keys = Map.keys(gameState.playerMap)
+    # call helper to add new player to the spare spot in the map
     addToPlayerMapHelper(gameState, playerName, keys)
   end
 
-  #
+
+  # a helper method for addToPlayerMap that iterates through
+  # the given set of keys, finds the next spare spot in the map
+  # and adds it there
+  # NOTE: if not spare spots left, throws an error
   def addToPlayerMapHelper(gameState, playerName, keys) do
     if (length(keys) == 0) do
       # end of list - player cannot be added
       raise "Error: trying to add player to the full game (addPlayerMap)"
     else
+      # else there are still spots left - > check if this spot is empty
       if (Map.get(gameState.playerMap, hd(keys)) == nil) do
         # found empty spot - add playerName
         newPlayerMap = Map.put(gameState.playerMap, hd(keys), playerName)
+        # update gameState with new player map and return
         %{gameState | playerMap: newPlayerMap}
       else
         # else check next spot
@@ -131,6 +147,7 @@ defmodule FourDigits.Game do
   def toggleReady(gameState, playerName) do
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
+    # if the player doesn't exist, the game is over or in progress, do nothing
     if (player == nil
         || isGameOver(gameState)
         || isGameInProgress(gameState)) do
@@ -142,7 +159,8 @@ defmodule FourDigits.Game do
       playersReady = %{gameState.playersReady | player: true}
       # update game state with new players ready
       newState = %{gameState | playersReady: playersReady}
-      # check if state change is required
+      # check if state change is required, and if so update state to :playing
+      # (if every player is ready)
       if (isAllReady(newState, newState.playerNames)) do
         # change the game state to ready
         %{newState | gameState: :playing}
@@ -153,34 +171,49 @@ defmodule FourDigits.Game do
     end
   end
 
+
   # return true if the game is full (e.g. the number
   # of players has reached 4
   def isGameFull(gameState) do
     length(gameState.playerNames) >= 4
   end
 
+
   # returns true if the given gameState is in the :gameOver state
   def isGameOver(gameState) do
     gameState.gameState == :gameOver
   end
 
+
+  # returns true if the game is in the :setUp state
+  def isGameInSetUp(gameState) do
+    gameState.gameState == :setUp
+  end
+
+
   # returns true if all players are ready
   def isAllReady(gameState, playerNames) do
+    # if all other players are ready, then everyone is ready
     if (length(playerNames) == 0) do
       true
     else
+      # else check if this player is ready and the rest are ready
       isPlayerReady(gameState, hd(playerNames))
       && isAllReady(gameState, tl(playerNames))
     end
   end
 
+
   # returns true if given player is ready
   # assumes that playerName is in the list (map) of players
   def isPlayerReady(gameState, playerName) do
     player = getPlayerAtom(gameState, playerName)
+    # check playersReady map if selected player is ready
     Map.get(gameState.playersReady, player)
   end
 
+
+  # returns true if the game state is :playing
   def isGameInProgress(gameState) do
     gameState.gameState == :playing
   end
@@ -189,18 +222,30 @@ defmodule FourDigits.Game do
   # returns the player atom given the game state and the playerName
   # value in the map
   def getPlayerAtom(gameState, playerName) do
+    # get all the keys from playerMap (p1, p2, p3, p4)
     mapKeys = gameState.playerMap.keys()
+    # use the helper to get the right key associated with given player name
     getPlayerAtomHelp(mapKeys, gameState.playerMap, playerName)
   end
 
 
   # helper that returns an atom key in the map given set of map keys,
   # the map which keys belong to, and the value (playerName)
+  # if playerNa,e nt found returns nil
   def getPlayerAtomHelp(mapKeys, map, playerName) do
-    if (Map.get(map, hd(mapKeys)) == playerName) do
-      hd(mapKeys)
+    if (length(mapKeys) == 0) do
+      # if here, playerName somehow not found in the map
+      nil
     else
-      getPlayerAtomHelp(tl(mapKeys), map, playerName)
+      # check if the value of the first entry in the list of keys in the given map
+      # matches given playerName
+      if (Map.get(map, hd(mapKeys)) == playerName) do
+        # found the key of the given playerName - return to the caller
+        hd(mapKeys)
+      else
+        # check the rest of the map keys
+        getPlayerAtomHelp(tl(mapKeys), map, playerName)
+      end
     end
   end
 
@@ -208,7 +253,7 @@ defmodule FourDigits.Game do
   # updates the hints of the given game state given player name
   # and a new guess
   def updateHints(gameState, playerName, newGuess) do
-    # get a guess for the hint
+    # get a hints from the given guess
     newHint = getHint(gameState.secret, newGuess)
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
@@ -249,6 +294,15 @@ defmodule FourDigits.Game do
   end
 
 
+  # increments wins and losses for all the winners and losers
+  def incrementWinsLosses(gameState) do
+    # get players keys
+    playerKeys = Map.keys(gameState.playerMap)
+  end
+
+  def increment
+
+
   # checks if there are any winners in the given game
   # and updates the game state accordingly
   def checkWinners(gameState) do
@@ -256,8 +310,8 @@ defmodule FourDigits.Game do
     newState = updateWinnersList(gameState, gameState.playerNames)
     # check if there is at least one winner
     if (hasWinner(newState, newState.playerNames)) do
-      # TODO: increment wins and losses
-
+      # increment wins and losses
+      newState = incrementWinsLosses(newState)
       # update game state to gameOver
       %{newState | gameState: :gameOver}
     else
@@ -512,9 +566,9 @@ defmodule FourDigits.Game do
       playerGuesses: state.playerGuesses,
       playerHints: state.playerHints,
       playerNames: state.playerNames,
-      winners: state.winners,
+      wins: state.wins,
+      losses: state.losses,
       gameState: state.gameState,
-      gameName: state.gameName,
       status: state.status
     }
   end

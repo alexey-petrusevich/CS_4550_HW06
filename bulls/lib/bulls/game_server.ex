@@ -15,6 +15,7 @@ defmodule FourDigits.GameServer do
     {:via, Registry, {FourDigits.GameReg, gameName}}
   end
 
+
   # starts the game given the name of the game
   def start(gameName) do
     spec = %{

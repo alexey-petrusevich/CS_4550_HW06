@@ -4,16 +4,16 @@ defmodule BullsWeb.GameChannel do
   alias FourDigits.Game
   alias FourDigits.GameServer
 
-  # this method is called when a new game is created
+
+  # this method is called when a new channel is created
   @impl true
-  def join("game:" <> gameName, %{"playerName" => playerName}, socket) do
+  def join("game:" <> gameName, payload, socket) do
     # start game server (a.k.a. initialize new game when joined)
     # this would not start a duplicate server - all the keys in corresponding
     # Registry are unique
     GameServer.start(gameName)
     # create new socket, and store game name in the socket
     socket = socket
-             # store name of the game in the socket
              |> assign(:gameName, gameName)
     # get state of the game from the server (process)
     # here the game should be fresh - no guesses made
@@ -28,37 +28,45 @@ defmodule BullsWeb.GameChannel do
 
 
   @impl true
-  def handle_in("login", %{"gameName" => gameName}) do
+  def handle_in("login", _, socket) do
+    gameName = socket.assigns[:gameName]
+    getGameView(gameName, socket)
+  end
+
+
+  @impl true
+  def handle_in("join_as_observer", _, socket) do
+    gameName = socket.assigns[:gameName]
+    getGameView(gameName, socket)
+  end
+
+
+  # simply returns a game view stored in the socket and the game server
+  def getGameView(gameName, socket) do
     view = socket.assigns[:gameName]
            |> GameServer.peek()
            |> Game.view()
     {:reply, {:ok, view}, socket}
   end
 
-  @impl true
-  def handle_in("join_as_observer", %{"gameName" => gameName}) do
-    view = socket.assigns[:gameName]
-           |> GameServer.peek()
-           |> Game.view()
-    {:reply, {:ok, view}, socket}
-  end
 
   @impl true
-  def handle_in("join_as_player", %{"playerName" => playerName, "gameName" => gameName}) do
-    # TODO implement
-    # update the game with new user and change the state if necessary
-    # this also covers the case when the game is in :playing state
-    if (!Game.isGameFull(gameState)) do
+  def handle_in("join_as_player", %{"playerName" => playerName}, socket) do
+    # retrieve game from the game server
+    gameState = socket.assigns[:gameName]
+                |> GameServer.peek()
+    # if the game is still in set up mode, join the game as player
+    if (Game.isGameInSetUp(gameState)) do
       # update the game with new player
       gameState = Game.updateJoin(gameState, playerName)
-
+      # truncate any sensitive info
+      view = Game.view(gameState)
+      {:reply, {:ok, view}, socket}
     else
-      # else game is full, just return view
-      # truncate any secret info and reveal only what is necessary
-      # to the caller
+      # else game is full, in progress, or game over
       view = Game.view(gameState)
       # return view back to the caller
-      {:ok, view, socket}
+      {:reply, {:ok, view}, socket}
     end
   end
 
@@ -74,30 +82,56 @@ defmodule BullsWeb.GameChannel do
         },
         socket
       ) do
-
-    # retrieve saved game name from the socket
-    view = socket.assigns[:gameName]
-           # make a new guess given playerName and newGuess
-           |> GameServer.makeGuess(playerName, newGuess)
-      # truncate state to what is viewed by the player (everyone?)
-           |> Game.view()
-    # broadcast the view to everyone connected to the socket
-    broadcast(socket, "view", view)
-    # send a reply with the view to the caller
-    {:reply, {:ok, view}, socket}
+    # retrieve game from the game server
+    gameState = socket.assigns[:gameName]
+                |> GameServer.peek()
+    # check if the game in progress
+    if (Game.isGameInProgress(gameState)) do
+      view = GameServer.makeGuess(playerName, newGuess)
+             # truncate state to what is viewed by the player (everyone?)
+             |> Game.view()
+      # broadcast the view to everyone connected to the socket
+      broadcast(socket, "view", view)
+      # send a reply with the view to the caller
+      {:reply, {:ok, view}, socket}
+    else
+      # else game is not in progress - no guessing allowed
+      # simply return the game state
+      view = Game.view(gameState)
+      # broadcast the view to everyone connected to the socket
+      broadcast(socket, "view", view)
+      # send a reply with the view to the caller
+      {:reply, {:ok, view}, socket}
+    end
   end
 
 
+  @impl true
   def handle_in("ready", %{"playerName" => playerName}, socket) do
-    # retrieve saved game name from the socket
-    # and mark it as ready
-    view = socket.assigns[:gameName]
-           |> GameServer.toggleReady(playerName)
-           |> Game.view()
-    # broadcast the view to everyone connected to the socket
-    broadcast(socket, "view", view)
-    # send a reply with the view to the caller
-    {:reply, {:ok, view}, socket}
+    # retrieve game state from the game server
+    gameState = socket.assigns[:gameName]
+                |> GameServer.peek()
+    # if game is full or in set up state, find the player and mark him ready
+    if (Game.isGameFull(gameState)
+        || Game.isGameInSetUp(gameState)) do
+      # retrieve saved game name from the socket
+      # and mark it as ready
+      view = socket.assigns[:gameName]
+             |> GameServer.toggleReady(playerName)
+             |> Game.view()
+      # broadcast the view to everyone connected to the socket
+      broadcast(socket, "view", view)
+      # send a reply with the view to the caller
+      {:reply, {:ok, view}, socket}
+    else
+      # game is not is setUp or gameFull state - do nothing
+      view = gameState
+             |> Game.view()
+      # broadcast the view to everyone connected to the socket
+      broadcast(socket, "view", view)
+      # send a reply with the view to the caller
+      {:reply, {:ok, view}, socket}
+    end
   end
 
 
@@ -123,6 +157,7 @@ defmodule BullsWeb.GameChannel do
     {:reply, {:ok, payload}, socket}
   end
 
+
   # It is also common to receive messages from the client and
   # broadcast to everyone in the current topic (game:lobby).
   @impl true
@@ -130,6 +165,7 @@ defmodule BullsWeb.GameChannel do
     broadcast socket, "shout", payload
     {:noreply, socket}
   end
+
 
   # Add authorization logic here as required.
   defp authorized?(_payload) do
