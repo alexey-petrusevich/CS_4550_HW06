@@ -17,6 +17,7 @@ defmodule FourDigits.Game do
         p4: []
       },
       playerNames: [],
+      observerNames: [],
       playerMap: %{
         # this is used to map player names with p1-p4 (may not need this)
         p1: "",
@@ -49,6 +50,18 @@ defmodule FourDigits.Game do
       status: "",
       secret: generateSecret()
     }
+  end
+
+
+  def updateObserver(gameState, observerName) do
+    if (!Enum.member?(gameState.observerNames, observerName)) do
+      # observer is not in the list of observer - add to the list
+      observerNames = gameState.observerNames ++ [observerName]
+      %{gameState | observerNames: observerNames}
+    else
+      # else observer is already in the list, do nothing
+      gameState
+    end
   end
 
 
@@ -113,9 +126,9 @@ defmodule FourDigits.Game do
   # adds a given playerName to the playerMap
   def addToPlayerMap(gameState, playerName) do
     # get player atom (key) given playerName
-#    IO.inspect("calling getPlayerAtom")
-#    player = getPlayerAtom(gameState, playerName)
-#    IO.inspect("player with name " <> playerName <> " has key " <> player)
+    #    IO.inspect("calling getPlayerAtom")
+    #    player = getPlayerAtom(gameState, playerName)
+    #    IO.inspect("player with name " <> playerName <> " has key " <> player)
     # get all the ksy from the player map (e.g. p1, p2, p3, p4)
     IO.inspect("getting all the keys from gameState.playerMap")
     keys = Map.keys(gameState.playerMap)
@@ -134,7 +147,7 @@ defmodule FourDigits.Game do
       # end of list - player cannot be added
       raise "Error: trying to add player to the full game (addPlayerMap)"
     else
-    IO.inspect("keys is not empty")
+      IO.inspect("keys is not empty")
       # else there are still spots left - > check if this spot is empty
       if (Map.get(gameState.playerMap, hd(keys)) == "") do
         IO.inspect("find empty spot for new player")

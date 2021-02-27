@@ -13,6 +13,7 @@ let state = {
   playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
   playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
   playerNames: [],
+  observerNames: [],
   playersReady: new Map(
       [["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
   wins: new Map(),
@@ -75,12 +76,12 @@ export function ch_ready(playerName, gameName) {
   });
 }
 
-export function ch_join_as_observer(gameName) {
+export function ch_join_as_observer(observerName, gameName) {
   // update channel with new gameName
   updateChannel(gameName)
 
   console.log("ch_join_as_observer called")
-  channel.push("join_as_observer", {})
+  channel.push("join_as_observer", {observerName: observerName})
   .receive("ok", state_update)
   .receive("error", resp => {
     console.log("unable to join as observer", resp)

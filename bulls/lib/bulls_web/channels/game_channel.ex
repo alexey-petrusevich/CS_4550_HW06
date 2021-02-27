@@ -35,9 +35,13 @@ defmodule BullsWeb.GameChannel do
 
 
   @impl true
-  def handle_in("join_as_observer", _, socket) do
-    gameName = socket.assigns[:gameName]
-    getGameView(gameName, socket)
+  def handle_in("join_as_observer", %{"observerName" => observerName}, socket) do
+    gameState = socket.assigns[:gameName]
+                |> GameServer.peek()
+    # add to the list of observers
+    gameState = Game.updateObserver(gameState, observerName)
+    view = Game.view(gameState)
+    {:reply, {:ok, view}, socket}
   end
 
 

@@ -63,7 +63,7 @@ function JoinPage({state}) {
   }
 
   function asObserver() {
-    ch_join_as_observer(gameName)
+    ch_join_as_observer(playerName, gameName)
   }
 
   function isGameFull() {
@@ -375,6 +375,7 @@ function FourDigits() {
     playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
     playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
     playerNames: [],
+    observerNames: [],
     playersReady: new Map(
         [["p1", false], ["p2", false], ["p3", false], ["p4", false]]),
     wins: new Map(),
@@ -389,11 +390,16 @@ function FourDigits() {
 
   let body = null;
 
+  function hasRoleSelected() {
+    return state.observerNames.includes(playerName)
+        || state.playerNames.includes(playerName);
+  }
+
   if (playerName.length === 0) {
     body = <LoginPage/>
   } else if (state.gameState === "setUp") {
     body = <JoinPage state={state}/>
-  } else if (state.gameState === "gameFull") {
+  } else if (state.gameState === "setUp" && hasRoleSelected()) {
     body = <WaitingPage state={state}/>
   } else if (state.gameState === "playing") {
     body = <PlayPage st={state}/>
