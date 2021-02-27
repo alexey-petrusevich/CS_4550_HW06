@@ -10,11 +10,12 @@ socket.connect()
 let channel = socket.channel("game:1", {})
 
 let state = {
-  playerGuesses: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
-  playerHints: new Map([["p1", []], ["p2", []], ["p3", []], ["p4", []]]),
+  playerGuesses: {p1: [], p2: [], p3: [], p4: []},
+  playerHints: {p1: [], p2: [], p3: [], p4: []},
   playerNames: [],
-  wins: new Map(),
-  losses: new Map(),
+  winners: {},
+  wins: {},
+  losses: {},
   gameState: "",
   status: ""
 }
@@ -45,6 +46,7 @@ function updateChannel(gameName) {
   })
   channel.on("view", state_update());
 }
+
 
 export function ch_login(playerName, gameName) {
   // update channel with new gameName
@@ -94,6 +96,7 @@ export function ch_join_as_player(playerName, gameName) {
   });
 }
 
+
 export function ch_push(guess, playerName, gameName) {
   // update channel with new gameName
   updateChannel(gameName)
@@ -104,6 +107,7 @@ export function ch_push(guess, playerName, gameName) {
     console.log("unable to push", resp)
   });
 }
+
 
 export function ch_reset(gameName) {
   // update channel with new gameName
