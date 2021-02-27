@@ -89,7 +89,7 @@ function FourDigits() {
 
     // calls ch_login to get game information
     function login() {
-        ch_login();
+        ch_login({gameName: gameName});
 
         if (gameState === "setUp" || gameState === "gameFull" || gameState === "gameOver") {
             JoinPage();
@@ -99,7 +99,7 @@ function FourDigits() {
             if (playerNames.includes(playerName)) {
                 PlayingPage();
             } else {
-                ch_join_as_observer();
+                ch_join_as_observer({gameName: gameName});
                 PlayingPage();
             }
         }
@@ -107,12 +107,12 @@ function FourDigits() {
 
     // marks a player as ready
     function ready() {
-        ch_ready({playerName: playerName});
+        ch_ready({playerName: playerName, gameName: gameName});
     }
 
     // user joins game as observer
     function join_as_observer() {
-        ch_join_as_observer();
+        ch_join_as_observer({gameName: gameName});
 
         if (gameState === "setUp" || gameState === "gameFull" || gameState === "gameOver") {
             WaitingPage();
@@ -125,19 +125,19 @@ function FourDigits() {
 
     // user joins game as player
     function join_as_player() {
-        ch_join_as_player({playerName: playerName});
+        ch_join_as_player({playerName: playerName, gameName: gameName});
         WaitingPage();
     }
 
     // user makes guess
     function make_guess() {
-        ch_push({guess: guess, playerName: playerName});
+        ch_push({guess: guess, playerName: playerName, gameName: gameName});
     }
 
     // reset the game or something
     function reset() {
         console.log("game reset");
-        ch_reset();
+        ch_reset({gameName: gameName});
     }
 
 

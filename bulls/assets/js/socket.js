@@ -9,7 +9,7 @@ console.log("connecting to socket")
 socket.connect()
 console.log("socket connected")
 
-let gameVal = "game:" + gameName;
+let gameVal = "game:1";
 console.log("gameVal: " + gameVal)
 console.log("requesting channel")
 let channel = socket.channel(gameVal, {})
@@ -42,7 +42,8 @@ export function ch_join(cb) {
     callback(state)
 }
 
-export function ch_login() {
+export function ch_login(gameName) {
+    let channel = socket.channel("game:" + gameName, {})
     console.log("ch_login called")
     channel.push("login", {})
         .receive("ok", state_update)
@@ -51,7 +52,8 @@ export function ch_login() {
         });
 }
 
-export function ch_ready(playerName) {
+export function ch_ready(playerName, gameName) {
+    let channel = socket.channel("game:" + gameName, {})
     console.log("ch_ready called")
     channel.push("ready", {playerName: playerName})
         .receive("ok", state_update)
@@ -60,7 +62,8 @@ export function ch_ready(playerName) {
         });
 }
 
-export function ch_join_as_observer() {
+export function ch_join_as_observer(gameName) {
+    let channel = socket.channel("game:" + gameName, {})
     console.log("ch_join_as_observer called")
     channel.push("join_as_observer", {})
         .receive("ok", state_update)
@@ -69,7 +72,8 @@ export function ch_join_as_observer() {
         });
 }
 
-export function ch_join_as_player(playerName) {
+export function ch_join_as_player(playerName, gameName) {
+    let channel = socket.channel("game:" + gameName, {})
     console.log("ch_join_as_player called")
     channel.push("join_as_player", {playerName: playerName})
         .receive("ok", state_update)
@@ -78,7 +82,8 @@ export function ch_join_as_player(playerName) {
         });
 }
 
-export function ch_push(guess, playerName) {
+export function ch_push(guess, playerName, gameName) {
+    let channel = socket.channel("game:" + gameName, {})
     channel.push("guess", {guess: guess, playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -86,7 +91,8 @@ export function ch_push(guess, playerName) {
         });
 }
 
-export function ch_reset() {
+export function ch_reset(gameName) {
+    let channel = socket.channel("game:" + gameName, {})
     console.log("ch_reset called")
     channel.push("reset", {})
         .receive("ok", state_update)
@@ -95,7 +101,7 @@ export function ch_reset() {
         });
 }
 
-console.log("calling join, gameName: " + gameName)
+console.log("calling join")
 
 channel.join()
     .receive("ok", state_update)
