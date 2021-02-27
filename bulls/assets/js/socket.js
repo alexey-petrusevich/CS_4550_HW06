@@ -47,7 +47,7 @@ function updateChannel(gameName) {
     console.log("Unable to join to channel", resp)
   })
   console.log("state received from calling join to the server: " + state)
-  channel.on("view", state_update());
+  channel.on("view", state_update(state));
 }
 
 export function ch_login(playerName, gameName) {
