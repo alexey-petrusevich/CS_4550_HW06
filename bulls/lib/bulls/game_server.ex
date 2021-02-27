@@ -148,18 +148,22 @@ defmodule FourDigits.GameServer do
   # this is used to broadcast to everyone on the channel the state of the game
   # handles pook calls (every 30 seconds by default)
   def handle_info(:pook, gameState) do
-    # make all guesses - take current guesses and put them into player's guesses
-    # this also updates hints
-    newState = Game.makeAllGuesses(gameState)
-    # clear current guesses
-    newState = Game.clearCurrentGuesses(newState)
-    # check if the game has been won
-    newState = Game.checkWinners(newState)
-    BullsWeb.Endpoint.broadcast!(
-      "game:" <> newState.gameName,
-      "view",
-      Game.view(gameState)
-    )
-    {:noreply, gameState}
+    if (Game.isGameInProgress(gameState)) do
+      # make all guesses - take current guesses and put them into player's guesses
+      # this also updates hints
+      newState = Game.makeAllGuesses(gameState)
+      # clear current guesses
+      newState = Game.clearCurrentGuesses(newState)
+      # check if the game has been won
+      newState = Game.checkWinners(newState)
+      BullsWeb.Endpoint.broadcast!(
+        "game:" <> newState.gameName,
+        "view",
+        Game.view(newState)
+      )
+      {:noreply, newState}
+    else
+      {:noreply, gameState}
+    end
   end
 end
