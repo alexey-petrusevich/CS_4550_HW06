@@ -19,7 +19,7 @@ let state = {
   losses: new Map(),
   gameState: "",
   status: ""
-}
+};
 
 let callback = null;
 
@@ -46,6 +46,7 @@ function updateChannel(gameName) {
   .receive("error", resp => {
     console.log("Unable to join to channel", resp)
   })
+  console.log("state received from calling join to the server: " + state)
   channel.on("view", state_update());
 }
 

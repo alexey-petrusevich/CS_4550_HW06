@@ -387,7 +387,7 @@ function FourDigits() {
     ch_join(setState)
   })
 
-  let body;
+  let body = null;
 
   if (playerName.length === 0) {
     body = <LoginPage/>
