@@ -114,22 +114,22 @@ function WaitingPage({state}) {
           </div>
         </div>
     );
-    let map = state.playersReady;
-    let mapKeys = Array.from(map.keys());
+    // let map = state.playersReady;
+    // let mapKeys = Array.from(map.keys());
 
     readyList.push(
         <div className="row">
           <div className="column">
-            {state.playersReady.get(mapKeys[0])}
+            {state.playersReady.get("p1")}
           </div>
           <div className="column">
-            {state.playersReady.get(mapKeys[1])}
+            {state.playersReady.get("p2")}
           </div>
           <div className="column">
-            {state.playersReady.get(mapKeys[2])}
+            {state.playersReady.get("p3")}
           </div>
           <div className="column">
-            {state.playersReady.get(mapKeys[3])}
+            {state.playersReady.get("p4")}
           </div>
         </div>
     );
