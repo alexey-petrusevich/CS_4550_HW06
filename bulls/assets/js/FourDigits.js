@@ -11,15 +11,16 @@ import {
 } from "./socket";
 
 // to hold the value of the game
+let playerName = "";
 let gameName = "";
 
 // returns a login page component
 function LoginPage() {
-  const [playerName, setPlayerName] = useState("");
+  const [playerNameState, setPlayerNameState] = useState("");
   const [gameNameState, setGameNameState] = useState("");
 
   function updatePlayerName(ev) {
-    setPlayerName(ev.target.value)
+    setPlayerNameState(ev.target.value)
   }
 
   function updateGameNameState(ev) {
@@ -27,8 +28,9 @@ function LoginPage() {
   }
 
   function login() {
-    ch_login(playerName, gameNameState)
-    gameName = gameNameState
+    ch_login(playerNameState, gameNameState);
+    playerName = playerNameState;
+    gameName = gameNameState;
   }
 
   return (
@@ -39,7 +41,7 @@ function LoginPage() {
           <label>User ID</label>
           <input
               type="text"
-              value={playerName}
+              value={playerNameState}
               onChange={updatePlayerName}
           />
           <label>Game ID</label>
@@ -55,7 +57,7 @@ function LoginPage() {
 }
 
 // returns join game component
-function JoinPage({playerName, state}) {
+function JoinPage({state}) {
   function asPlayer() {
     ch_join_as_player(playerName, gameName)
   }
@@ -81,11 +83,11 @@ function JoinPage({playerName, state}) {
   );
 }
 
-function WaitingPage({playerName, state}) {
-
-  let playerNames = state.playerNames;
+// returns waiting page component
+function WaitingPage({state}) {
 
   function isObserver() {
+    let playerNames = state.playerNames;
     return playerNames.includes(playerName);
   }
 
@@ -93,77 +95,66 @@ function WaitingPage({playerName, state}) {
     ch_ready(playerName, gameName);
   }
 
-  let statsPlayerNames = state.wins.keys;
+  function makeStatistics() {
+    let winsLosses = [];
+    let wins = state.wins;
+    let losses = state.losses;
+    let playerNames = Array.from(wins.keys());
+    let numEntries = playerNames.length;
 
-  for (let i = 0; i < 8; ++i) {
-    guessesHints.push(
+    // push header
+    winsLosses.push(
         <div className="row">
           <div className="column">
-            <p>{i + 1}</p>
+            <p>Player Name</p>
           </div>
           <div className="column">
             <p>
-              {guesses[i]}
+              Wins
             </p>
           </div>
           <div className="column">
             <p>
-              {hints[i]}
+              Losses
             </p>
           </div>
         </div>
-    );
+    )
+
+    // push statistics
+    for (let i = 0; i < numEntries; ++i) {
+      let playerName = playerNames[i];
+      winsLosses.push(
+          <div className="row">
+            <div className="column">
+              <p>{playerName}</p>
+            </div>
+            <div className="column">
+              <p>
+                {wins.get(playerName)}
+              </p>
+            </div>
+            <div className="column">
+              <p>
+                {losses.get(playerName)}
+              </p>
+            </div>
+          </div>
+      );
+    }
+
+    return winsLosses;
   }
 
-
+  let winsLosses = makeStatistics();
 
   return (
       <div className="row">
         <div className="column">
           <h1>Bulls and Cows</h1>
           <h2>Waiting on Players</h2>
-          <h3>Last rounds winners: {winners}</h3>
           <button onClick={ready} disabled={isObserver()}>Ready</button>
-
-
-          <table>
-            <tr>
-              <th>Player:</th>
-              <th>Name:</th>
-              <th>Wins:</th>
-              <th>Losses:</th>
-              <th>Ready?</th>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>{players[0]}</td>
-              <td>wins[playerNames[0]]</td>
-              <td>losses[playerNames[0]]</td>
-              <td>{ready[0]}</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>{players[1]}</td>
-              <td>wins[playerNames[1]]</td>
-              <td>losses[playerNames[1]]</td>
-              <td>{ready[1]}</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>{players[2]}</td>
-              <td>wins[playerNames[2]</td>
-              <td>losses[playerNames[2]]</td>
-              <td>{ready[2]}</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>{players[3]}</td>
-              <td>wins[playerNames[3]]</td>
-              <td>losses[playerNames[3]]</td>
-              <td>{ready[3]}</td>
-            </tr>
-          </table>
-
+          {winsLosses}
         </div>
       </div>
   );
