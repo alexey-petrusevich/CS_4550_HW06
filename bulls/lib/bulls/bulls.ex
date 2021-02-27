@@ -114,9 +114,12 @@ defmodule FourDigits.Game do
   def addToPlayerMap(gameState, playerName) do
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
+    IO.inspect("player with name " <> playerName <> " has key " <> player)
     # get all the ksy from the player map (e.g. p1, p2, p3, p4)
+    IO.inspect("getting all the keys from gameState.playerMap")
     keys = Map.keys(gameState.playerMap)
     # call helper to add new player to the spare spot in the map
+    IO.inspect("calling playerMap helper")
     addToPlayerMapHelper(gameState, playerName, keys)
   end
 
@@ -130,10 +133,14 @@ defmodule FourDigits.Game do
       # end of list - player cannot be added
       raise "Error: trying to add player to the full game (addPlayerMap)"
     else
+    IO.inspect("keys is not empty")
       # else there are still spots left - > check if this spot is empty
       if (Map.get(gameState.playerMap, hd(keys)) == nil) do
+        IO.inspect("find empty spot for new player")
         # found empty spot - add playerName
         newPlayerMap = Map.put(gameState.playerMap, hd(keys), playerName)
+        IO.inspect("updated newPlayerMap")
+        IO.inspect(newPlayerMap)
         # update gameState with new player map and return
         %{gameState | playerMap: newPlayerMap}
       else
