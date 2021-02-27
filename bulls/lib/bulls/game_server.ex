@@ -72,7 +72,7 @@ defmodule FourDigits.GameServer do
   # makes a call to ready
   def toggleReady(gameName, playerName) do
     IO.inspect("calling GenServer :ready")
-    GenServer.call(reg(gameName), {:ready, playerName})
+    GenServer.call(reg(gameName), {:ready, gameName, playerName})
   end
 
 
