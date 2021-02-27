@@ -397,6 +397,8 @@ function FourDigits() {
     return zzz;
   }
 
+  console.log("game state = " + state.gameState)
+
   if (playerName.length === 0) {
     body = <LoginPage/>
   } else if (state.gameState === "setUp") {
