@@ -70,8 +70,8 @@ defmodule BullsWeb.GameChannel do
       IO.inspect(gameState)
       # truncate any sensitive info
       view = Game.view(gameState)
-      IO.inspect("truncated gamestate: VIEW:::")
-      IO.inspect(view)
+      IO.inspect("truncated gameState: GAMESTATE:::")
+      IO.inspect(gameState)
       {:reply, {:ok, view}, socket}
     else
       # else game is full, in progress, or game over
