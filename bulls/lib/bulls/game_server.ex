@@ -130,8 +130,12 @@ defmodule FourDigits.GameServer do
   # simply returns the state of the game at any moment
   # for the callers
   def handle_call({:peek, gameName}, _from, gameState) do
+
     # get the game state from the backup agent
     game = BackupAgent.get(gameName)
+
+    IO.inspect("PEEK :> game taken from backup agent: ")
+    IO.inspect(game)
     # return the game state to the caller
     {:reply, game, game}
   end
