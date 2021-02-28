@@ -72,6 +72,8 @@ defmodule BullsWeb.GameChannel do
       view = Game.view(gameState)
       IO.inspect("truncated gameState: GAMESTATE:::")
       IO.inspect(gameState)
+      IO.inspect("gamestate in BackupAgent")
+      IO.inspect(FourDigits.BackupAgent.get(gameState.gameName))
       {:reply, {:ok, view}, socket}
     else
       # else game is full, in progress, or game over
