@@ -71,6 +71,7 @@ defmodule BullsWeb.GameChannel do
     # if the game is still in set up mode, join the game as player
     if (Game.isGameInSetUp(gameState)) do
       # update the game with new player
+      # TODO: fix this -- change from call to Game to GameServer
       gameState = Game.updateJoin(gameState, playerName)
       # truncate any sensitive info
       view = Game.view(gameState)
@@ -132,6 +133,7 @@ defmodule BullsWeb.GameChannel do
         || Game.isGameInSetUp(gameState)) do
       # retrieve saved game name from the socket
       # and mark it as ready
+
       view = socket.assigns[:gameName]
              |> GameServer.toggleReady(playerName)
              |> Game.view()
@@ -152,6 +154,27 @@ defmodule BullsWeb.GameChannel do
       {:reply, {:ok, view}, socket}
     end
   end
+
+
+
+
+  @impl true
+  def handle_in("start", %{"gameName" => gameName}, socket) do
+    IO.inspect("in handle_in start")
+    gameState = socket.assigns[:gameName]
+                |> GameServer.peek()
+    IO.inspect("gameState before calling startGame")
+    IO.inspect(gameState)
+    view = socket.assigns[:gameName]
+           |> GameServer.startGame()
+           |> Game.view()
+    IO.inspect("VIEW (start) BEFORE BROADCASTING")
+    IO.inspect(view)
+    broadcast(socket, "view", view)
+    {:reply, {:ok, view}, socket}
+  end
+
+
 
 
   # this endpoint listens to "reset" messages

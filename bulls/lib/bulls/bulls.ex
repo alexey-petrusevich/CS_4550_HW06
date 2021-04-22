@@ -143,7 +143,11 @@ defmodule FourDigits.Game do
       # else there are still spots left - > check if this spot is empty
       if (Map.get(gameState.playerMap, hd(keys)) == "") do
         # found empty spot - add playerName
-        newPlayerMap = Map.put(gameState.playerMap, hd(keys), playerName)
+        newPlayerMap = Map.put(
+          gameState.playerMap,
+          hd(keys),
+          playerName
+        )
         # update gameState with new player map and return
         %{gameState | playerMap: newPlayerMap}
       else
@@ -174,6 +178,7 @@ defmodule FourDigits.Game do
       # check if state change is required, and if so update state to :playing
       # (if every player is ready)
       if (isAllReady(newState, newState.playerNames)) do
+        IO.inspect("all players ready")
         # change the game state to ready
         %{newState | gameState: :playing}
       else
@@ -205,6 +210,16 @@ defmodule FourDigits.Game do
 
   # returns true if all players are ready
   def isAllReady(gameState, playerNames) do
+    if (length(playerNames) != 4) do
+      # if number of players is not 4, then players are not ready
+      false
+    else
+      # otherwise, check if every player is ready
+      isAllReadyHelper(gameState, playerNames)
+    end
+  end
+
+  def isAllReadyHelper(gameState, playerNames) do
     # if all other players are ready, then everyone is ready
     if (length(playerNames) == 0) do
       true
@@ -274,7 +289,11 @@ defmodule FourDigits.Game do
     # update the list of hints of the given payer with new hint
     playerHintsList = playerHintsList ++ [newHint]
     # update player hints map
-    playerHints = Map.put(gameState.playerHints, player, playerHintsList)
+    playerHints = Map.put(
+      gameState.playerHints,
+      player,
+      playerHintsList
+    )
     # update hints of the corresponding player
     %{gameState | playerHints: playerHints}
   end
@@ -290,7 +309,11 @@ defmodule FourDigits.Game do
     # update the list of guesses of the given payer with new guess
     playerGuessesList = playerGuessesList ++ [newGuess]
     # update player guesses map
-    playerGuesses = Map.put(gameState.playerGuesses, player, playerGuessesList)
+    playerGuesses = Map.put(
+      gameState.playerGuesses,
+      player,
+      playerGuessesList
+    )
     # update guesses of the corresponding player
     %{gameState | playerGuesses: playerGuesses}
   end
@@ -397,7 +420,11 @@ defmodule FourDigits.Game do
   def updateWinnerStatus(gameState) do
     if (hasWinner(gameState, gameState.playerNames)) do
       # there is at least one winner - update status
-      updateWinnersStatusHelper(gameState, "Winners: ", gameState.playerNames)
+      updateWinnersStatusHelper(
+        gameState,
+        "Winners: ",
+        gameState.playerNames
+      )
     else
       # no winners - no need to update status
       gameState
@@ -416,7 +443,11 @@ defmodule FourDigits.Game do
       # get player atom (key) given playerName
       player = getPlayerAtom(gameState, playerName)
       if (Map.get(gameState.winner, player)) do
-        updateWinnersStatusHelper(gameState, status <> playerName <> " ", tl(playerNames))
+        updateWinnersStatusHelper(
+          gameState,
+          status <> playerName <> " ",
+          tl(playerNames)
+        )
       else
       end
     end
@@ -463,7 +494,11 @@ defmodule FourDigits.Game do
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
     # create new map of current guesses with updated value
-    currentGuesses = Map.put(gameState.currentGuesses, player, newGuess)
+    currentGuesses = Map.put(
+      gameState.currentGuesses,
+      player,
+      newGuess
+    )
     # update game state with new current guesses map
     %{gameState | currentGuesses: currentGuesses}
   end
@@ -558,7 +593,12 @@ defmodule FourDigits.Game do
     guessList = String.codepoints(guess)
     hintCounts = %{numA: 0, numB: 0}
     # this call returns a map with hintCounts populated
-    hintCounts = getHintHelper(secretList, secretList, guessList, hintCounts)
+    hintCounts = getHintHelper(
+      secretList,
+      secretList,
+      guessList,
+      hintCounts
+    )
     hintMapToString(hintCounts)
   end
 
@@ -576,7 +616,12 @@ defmodule FourDigits.Game do
 
   # returns a map containing As and Bs for bulls and cows game
   # assumes secretList, and guessList have same length
-  def getHintHelper(secretListOriginal, secretList, guessList, hintCounts) do
+  def getHintHelper(
+        secretListOriginal,
+        secretList,
+        guessList,
+        hintCounts
+      ) do
     if (length(secretList) > 0) do
       cond do
         # A - places match
@@ -666,6 +711,12 @@ defmodule FourDigits.Game do
     newState = Map.put(newState.currentGuesses, :p3, "")
     newState = Map.put(newState.currentGuesses, :p4, "")
     newState
+  end
+
+
+  # updates the state of the game to "playing"
+  def startGame(gameState) do
+    %{gameState | gameState: :playing}
   end
 end
 

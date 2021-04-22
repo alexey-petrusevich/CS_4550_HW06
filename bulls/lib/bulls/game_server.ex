@@ -75,6 +75,13 @@ defmodule FourDigits.GameServer do
   end
 
 
+  def startGame(gameName) do
+    GenServer.call(reg(gameName), {:start, gameName})
+  end
+
+
+
+
   # returns the state of the game given the name of the game
   # this is a wrapper method for GenServer.call -> :peek
   # actual listener is below
@@ -89,6 +96,13 @@ defmodule FourDigits.GameServer do
     # :pook will append any guesses and check for the winners
     Process.send_after(self(), :pook, 30_000)
     {:ok, game} # this is returned if start_link was successful
+  end
+
+
+  def handle_call({:start, gameName}, _from, gameState) do
+    gameState = Game.startGame(gameState)
+    BackupAgent.put(gameName, gameState)
+    {:reply, gameState, gameState}
   end
 
 
@@ -119,7 +133,11 @@ defmodule FourDigits.GameServer do
 
   # handles reset call from GenServer.call
   def handle_call({:ready, gameName, playerName}, _from, gameState) do
+    IO.inspect("handle_call for READY")
+    IO.inspect(gameState)
     gameState = Game.toggleReady(gameState, playerName)
+    IO.inspect("called Game.toggleReady")
+    IO.inspect(gameState)
     BackupAgent.put(gameName, gameState)
     {:reply, gameState, gameState}
   end

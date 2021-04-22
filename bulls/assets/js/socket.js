@@ -36,7 +36,6 @@ function state_update(st) {
 }
 
 export function ch_join(cb) {
-    // console.log("ch_join called")
     callback = cb;
     callback(state)
 }
@@ -51,7 +50,7 @@ function updateChannel(gameName) {
             console.log("Unable to join to channel", resp)
         });
     console.log("state received from calling join to the server: " + state)
-    channel.on("view", state_update(state));
+    channel.on("view", state_update);
 }
 
 export function ch_login(playerName, gameName) {
@@ -78,6 +77,14 @@ export function ch_ready(playerName, gameName) {
             console.log("unable to select ready", resp)
         });
     console.log("state updated in ch_ready: ", state)
+}
+
+export function ch_start(gameName) {
+    channel.push("start", {gameName: gameName})
+        .receive("ok", state_update)
+        .receive("error", resp => {
+            console.log("unable to start the game", resp)
+        });
 }
 
 export function ch_join_as_observer(observerName, gameName) {
