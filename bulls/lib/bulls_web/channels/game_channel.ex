@@ -29,13 +29,18 @@ defmodule BullsWeb.GameChannel do
 
   @impl true
   def handle_in("login", _, socket) do
+    # retrieve name of the game from the socket
     gameName = socket.assigns[:gameName]
     getGameView(gameName, socket)
   end
 
 
   @impl true
-  def handle_in("join_as_observer", %{"observerName" => observerName}, socket) do
+  def handle_in(
+        "join_as_observer",
+        %{"observerName" => observerName},
+        socket
+      ) do
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
     # add to the list of observers
@@ -55,25 +60,21 @@ defmodule BullsWeb.GameChannel do
 
 
   @impl true
-  def handle_in("join_as_player", %{"playerName" => playerName}, socket) do
+  def handle_in(
+        "join_as_player",
+        %{"playerName" => playerName},
+        socket
+      ) do
     # retrieve game from the game server
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
-    IO.inspect("retrieved game from the game server")
-    IO.inspect(gameState)
     # if the game is still in set up mode, join the game as player
     if (Game.isGameInSetUp(gameState)) do
       # update the game with new player
-      IO.inspect("updating join")
       gameState = Game.updateJoin(gameState, playerName)
-      IO.inspect("updated join successfully")
-      IO.inspect(gameState)
       # truncate any sensitive info
       view = Game.view(gameState)
-      IO.inspect("truncated gameState: GAMESTATE:::")
-      IO.inspect(gameState)
-      IO.inspect("gamestate in BackupAgent")
-      IO.inspect(FourDigits.BackupAgent.get(gameState.gameName))
+      FourDigits.BackupAgent.put(gameState.gameName, gameState)
       {:reply, {:ok, view}, socket}
     else
       # else game is full, in progress, or game over
@@ -122,7 +123,6 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def handle_in("ready", %{"playerName" => playerName}, socket) do
     # retrieve game state from the game server
-    IO.inspect("handle_in ready")
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
     IO.inspect("retrieved gamestate from gameserver")
@@ -135,8 +135,11 @@ defmodule BullsWeb.GameChannel do
       view = socket.assigns[:gameName]
              |> GameServer.toggleReady(playerName)
              |> Game.view()
+      IO.inspect("VIEW BEFORE BROADCAST")
+      IO.inspect(view)
       # broadcast the view to everyone connected to the socket
       broadcast(socket, "view", view)
+      IO.inspect("sent broadcast")
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
     else
@@ -157,8 +160,10 @@ defmodule BullsWeb.GameChannel do
     #    user = socket.assigns[:user]
     view = socket.assigns[:gameName] # get name of the game and pass it to the reset
            # game server will use the saved name to find the name in the Registry
-           |> GameServer.reset() # reset the game and get fresh game state
-           |> Game.view() # truncate all secrets by passing fresh state to the view() method
+           |> GameServer.reset(
+              ) # reset the game and get fresh game state
+           |> Game.view(
+              ) # truncate all secrets by passing fresh state to the view() method
     # broadcast new view to everyone connected to this socket
     broadcast(socket, "view", view)
     # send a reply back to the caller

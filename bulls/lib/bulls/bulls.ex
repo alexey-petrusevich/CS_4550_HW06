@@ -78,10 +78,8 @@ defmodule FourDigits.Game do
       # create new state wth new list of playerNames
       newState = %{gameState | playerNames: playerNames}
       # add player to the playerMap
-      IO.inspect("adding to players map")
       newState = addToPlayerMap(newState, playerName)
       # add player to wins and losses (if not present)
-      IO.inspect("adding to wins losses map")
       newState = addToWinsLosses(newState, playerName)
       # check if the game is full, and update game state if so
       if (isGameFull(newState)) do
@@ -126,14 +124,9 @@ defmodule FourDigits.Game do
   # adds a given playerName to the playerMap
   def addToPlayerMap(gameState, playerName) do
     # get player atom (key) given playerName
-    #    IO.inspect("calling getPlayerAtom")
-    #    player = getPlayerAtom(gameState, playerName)
-    #    IO.inspect("player with name " <> playerName <> " has key " <> player)
     # get all the ksy from the player map (e.g. p1, p2, p3, p4)
-    IO.inspect("getting all the keys from gameState.playerMap")
     keys = Map.keys(gameState.playerMap)
     # call helper to add new player to the spare spot in the map
-    IO.inspect("calling playerMap helper")
     addToPlayerMapHelper(gameState, playerName, keys)
   end
 
@@ -147,14 +140,10 @@ defmodule FourDigits.Game do
       # end of list - player cannot be added
       raise "Error: trying to add player to the full game (addPlayerMap)"
     else
-      IO.inspect("keys is not empty")
       # else there are still spots left - > check if this spot is empty
       if (Map.get(gameState.playerMap, hd(keys)) == "") do
-        IO.inspect("find empty spot for new player")
         # found empty spot - add playerName
         newPlayerMap = Map.put(gameState.playerMap, hd(keys), playerName)
-        IO.inspect("updated newPlayerMap")
-        IO.inspect(newPlayerMap)
         # update gameState with new player map and return
         %{gameState | playerMap: newPlayerMap}
       else
@@ -169,15 +158,11 @@ defmodule FourDigits.Game do
   # marks himself as ready
   def toggleReady(gameState, playerName) do
     # get player atom (key) given playerName
-    IO.inspect("getting player key for player: " <> playerName)
     player = getPlayerAtom(gameState, playerName)
     # if the player doesn't exist, the game is over or in progress, do nothing
-    IO.inspect("inspecting player in Game.toggleReady()")
-    IO.inspect(player)
     if (player == nil
         || isGameOver(gameState)
         || isGameInProgress(gameState)) do
-      IO.inspect("player is nil -> return game state")
       # do nothing if either player not found, game over,
       # or game is progress
       gameState
@@ -186,8 +171,6 @@ defmodule FourDigits.Game do
       playersReady = Map.put(gameState.playersReady, player, true)
       # update game state with new players ready
       newState = %{gameState | playersReady: playersReady}
-      IO.inspect("state updated in model")
-      IO.inspect(newState)
       # check if state change is required, and if so update state to :playing
       # (if every player is ready)
       if (isAllReady(newState, newState.playerNames)) do
@@ -253,10 +236,7 @@ defmodule FourDigits.Game do
   def getPlayerAtom(gameState, playerName) do
     # get all the keys from playerMap (p1, p2, p3, p4)
     mapKeys = Map.keys(gameState.playerMap) # p1, p2, p3, p4
-    IO.inspect("got the keys from players map")
-    IO.inspect(mapKeys)
     # use the helper to get the right key associated with given player name
-    IO.inspect("calling getPlayerAtomHelp")
     getPlayerAtomHelp(mapKeys, gameState.playerMap, playerName)
   end
 
@@ -265,27 +245,16 @@ defmodule FourDigits.Game do
   # the map which keys belong to, and the value (playerName)
   # if playerNa,e nt found returns nil
   def getPlayerAtomHelp(mapKeys, map, playerName) do
-    IO.inspect("in getPlayerAtomHelp")
-    IO.inspect("mapKeys")
-    IO.inspect(mapKeys)
-    IO.inspect("map")
-    IO.inspect(map)
-    IO.inspect("playerName")
-    IO.inspect(playerName)
     if (length(mapKeys) == 0) do
       # if here, playerName somehow not found in the map
-      IO.inspect("player name not found????")
       nil
     else
       # check if the value of the first entry in the list of keys in the given map
       # matches given playerName
-      IO.inspect("checking if key = ")
       if (Map.get(map, hd(mapKeys)) == playerName) do
         # found the key of the given playerName - return to the caller
-        IO.inspect("key found!")
         hd(mapKeys)
       else
-        IO.inspect("recurring through the rest of keys")
         # check the rest of the map keys
         getPlayerAtomHelp(tl(mapKeys), map, playerName)
       end

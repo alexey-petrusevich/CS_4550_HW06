@@ -71,7 +71,6 @@ defmodule FourDigits.GameServer do
 
   # makes a call to ready
   def toggleReady(gameName, playerName) do
-    IO.inspect("calling GenServer :ready")
     GenServer.call(reg(gameName), {:ready, gameName, playerName})
   end
 
@@ -120,22 +119,17 @@ defmodule FourDigits.GameServer do
 
   # handles reset call from GenServer.call
   def handle_call({:ready, gameName, playerName}, _from, gameState) do
-    IO.inspect("callning Game.toggleReady()")
-    game = Game.toggleReady(gameState, playerName)
-    BackupAgent.put(gameName, game)
-    {:reply, game, game}
+    gameState = Game.toggleReady(gameState, playerName)
+    BackupAgent.put(gameName, gameState)
+    {:reply, gameState, gameState}
   end
 
 
   # simply returns the state of the game at any moment
   # for the callers
   def handle_call({:peek, gameName}, _from, gameState) do
-
     # get the game state from the backup agent
     game = BackupAgent.get(gameName)
-
-    IO.inspect("PEEK :> game taken from backup agent: ")
-    IO.inspect(game)
     # return the game state to the caller
     {:reply, game, game}
   end

@@ -91,7 +91,12 @@ function WaitingPage({state}) {
   }
 
   function ready() {
+    console.log("Ready Button clicked")
+    console.log("calling ch_ready from FourDigits.js")
     ch_ready(playerName, gameName);
+    console.log("Returned from ch_ready in FourDigits.js")
+    console.log("marked player as ready")
+    console.log("gameState: ", state)
   }
 
   return (
@@ -199,7 +204,9 @@ function PlayPage({st}) {
   );
 
   function ResultTable({guesses, hints}) {
-    let numEntries = guesses["p1"][0].length;
+    console.log("in ResultTable, inspecting guesses")
+    console.log(guesses)
+    let numEntries = guesses["p1"].length;
 
     function pushHeader() {
       let guessesHints = []
