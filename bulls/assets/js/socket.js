@@ -24,15 +24,10 @@ let state = {
 let callback = null;
 
 function state_update(st) {
-    console.log("state_update gameState:", st);
     state = st;
     if (callback) {
-        console.log("calling callback")
         callback(st);
-        console.log("called callback")
-        console.log("gameState: ", state)
     }
-    console.log("state in state_update", state)
 }
 
 export function ch_join(cb) {
@@ -49,7 +44,6 @@ function updateChannel(gameName) {
         .receive("error", resp => {
             console.log("Unable to join to channel", resp)
         });
-    console.log("state received from calling join to the server: " + state)
     channel.on("view", state_update);
 }
 

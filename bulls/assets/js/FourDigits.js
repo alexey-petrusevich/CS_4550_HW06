@@ -97,17 +97,29 @@ function WaitingPage({state}) {
         return state.gameState !== "gameFull";
     }
 
+    function allPlayersReady() {
+        let playersReady = state.playersReady;
+        return playersReady["p1"]
+            && playersReady["p2"]
+            && playersReady["p3"]
+            && playersReady["p4"];
+    }
+
     function ready() {
-        console.log("Ready Button clicked")
-        console.log("calling ch_ready from FourDigits.js")
         ch_ready(playerName, gameName);
-        console.log("Returned from ch_ready in FourDigits.js")
-        console.log("marked player as ready")
-        console.log("gameState: ", state)
     }
 
     function startGame() {
         ch_start(gameName);
+    }
+
+    function isGameReady() {
+        let a = isGameNotFull();
+        let b = !allPlayersReady()
+        console.log("gameState", state)
+        console.log("isGameNotFull: ", a)
+        console.log("!allPlayersReady: ", b)
+        return a || b;
     }
 
     return (
@@ -120,7 +132,7 @@ function WaitingPage({state}) {
                             disabled={isObserver()}>Ready
                     </button>
                     <button onClick={startGame}
-                            disabled={isGameNotFull()}>Start Game
+                            disabled={isGameReady()}>Start Game
                     </button>
                     <div className="row">
                         <div className="column">
