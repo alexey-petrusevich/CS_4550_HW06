@@ -65,7 +65,10 @@ defmodule FourDigits.GameServer do
   # this is a wrapper method for GenServer.call -> :makeGuess
   # actual listener is below
   def makeGuess(gameName, playerName, newGuess) do
-    GenServer.call(reg(gameName), {:makeGuess, gameName, playerName, newGuess})
+    GenServer.call(
+      reg(gameName),
+      {:makeGuess, gameName, playerName, newGuess}
+    )
   end
 
 
@@ -121,7 +124,11 @@ defmodule FourDigits.GameServer do
 
 
   # handles guess calls from GenServer.call
-  def handle_call({:makeGuess, gameName, playerName, newGuess}, _from, game) do
+  def handle_call(
+        {:makeGuess, gameName, playerName, newGuess},
+        _from,
+        game
+      ) do
     # modifies the game with the new guess
     game = Game.makeGuess(game, playerName, newGuess)
     # put modified game into the backup agent
@@ -133,11 +140,7 @@ defmodule FourDigits.GameServer do
 
   # handles reset call from GenServer.call
   def handle_call({:ready, gameName, playerName}, _from, gameState) do
-    IO.inspect("handle_call for READY")
-    IO.inspect(gameState)
     gameState = Game.toggleReady(gameState, playerName)
-    IO.inspect("called Game.toggleReady")
-    IO.inspect(gameState)
     BackupAgent.put(gameName, gameState)
     {:reply, gameState, gameState}
   end

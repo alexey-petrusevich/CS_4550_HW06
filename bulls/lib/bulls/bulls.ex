@@ -178,7 +178,6 @@ defmodule FourDigits.Game do
       # check if state change is required, and if so update state to :playing
       # (if every player is ready)
       if (isAllReady(newState, newState.playerNames)) do
-        IO.inspect("all players ready")
         # change the game state to ready
         %{newState | gameState: :playing}
       else
@@ -513,14 +512,14 @@ defmodule FourDigits.Game do
       newState = updateCurrentGuesses(gameState, playerName, newGuess)
       # clear the status if it isn't clear
       clearStatus(newState)
+    else
+      # new guess is not valid, update game state with new status
+      %{
+        gameState |
+        status: playerName <> ":> " <>
+                              "A guess must be a 4-digit unique integer (1-9)"
+      }
     end
-
-    # new guess is not valid, update game state with new status
-    %{
-      gameState |
-      status: playerName <> ":> " <>
-                            "A guess must be a 4-digit unique integer (1-9)"
-    }
   end
 
 
@@ -567,10 +566,10 @@ defmodule FourDigits.Game do
 
   # helper for isValidInput, but accept a list of characters
   def isValidInputHelper(list) do
-    if (length(list) > 0) do
-      isValidChar(hd(list)) && isValidInputHelper(tl(list))
-    else
+    if (length(list) == 0) do
       true
+    else
+      isValidChar(hd(list)) && isValidInputHelper(tl(list))
     end
   end
 
@@ -622,7 +621,9 @@ defmodule FourDigits.Game do
         guessList,
         hintCounts
       ) do
-    if (length(secretList) > 0) do
+    if (length(guessList) == 0) do
+      hintCounts
+    else
       cond do
         # A - places match
         hd(secretList) == hd(guessList) ->
@@ -648,8 +649,6 @@ defmodule FourDigits.Game do
             hintCounts
           )
       end
-    else
-      hintCounts
     end
   end
 
@@ -706,11 +705,12 @@ defmodule FourDigits.Game do
 
   # clears current gasses of the given gameState
   def clearCurrentGuesses(gameState) do
-    newState = Map.put(gameState.currentGuesses, :p1, "")
-    newState = Map.put(newState.currentGuesses, :p2, "")
-    newState = Map.put(newState.currentGuesses, :p3, "")
-    newState = Map.put(newState.currentGuesses, :p4, "")
-    newState
+    currentGuesses = gameState.currentGuesses
+    currentGuesses = %{currentGuesses | p1: ""}
+    currentGuesses = %{currentGuesses | p2: ""}
+    currentGuesses = %{currentGuesses | p3: ""}
+    currentGuesses = %{currentGuesses | p4: ""}
+    %{gameState | currentGuesses: currentGuesses}
   end
 
 

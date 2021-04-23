@@ -92,17 +92,17 @@ defmodule BullsWeb.GameChannel do
   def handle_in(
         "guess",
         %{
-          "playerName" => playerName,
-          "guess" => newGuess
+          "guess" => newGuess,
+          "playerName" => playerName
         },
         socket
       ) do
     # retrieve game from the game server
-    gameState = socket.assigns[:gameName]
-                |> GameServer.peek()
+    gameName = socket.assigns[:gameName]
+    gameState = GameServer.peek(gameName)
     # check if the game in progress
     if (Game.isGameInProgress(gameState)) do
-      view = GameServer.makeGuess(playerName, newGuess)
+      view = GameServer.makeGuess(gameName, playerName, newGuess)
              # truncate state to what is viewed by the player (everyone?)
              |> Game.view()
       # broadcast the view to everyone connected to the socket

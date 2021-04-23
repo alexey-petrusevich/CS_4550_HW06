@@ -44,7 +44,7 @@ function updateChannel(gameName) {
         .receive("error", resp => {
             console.log("Unable to join to channel", resp)
         });
-    channel.on("view", state_update);
+    //channel.on("view", state_update);
 }
 
 export function ch_login(playerName, gameName) {
@@ -105,10 +105,11 @@ export function ch_join_as_player(playerName, gameName) {
         });
 }
 
-export function ch_push(guess, playerName, gameName) {
+export function ch_push(guess, playerName) {
     // update channel with new gameName
-    updateChannel(gameName)
-
+    //updateChannel(gameName)
+    console.log("guess: ", guess);
+    console.log("playerName: ", playerName);
     channel.push("guess", {guess: guess, playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -127,3 +128,5 @@ export function ch_reset(gameName) {
             console.log("unable to reset", resp)
         });
 }
+
+channel.on("view", state_update);

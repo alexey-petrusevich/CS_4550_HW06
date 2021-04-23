@@ -193,7 +193,7 @@ function PlayPage({st}) {
 
     function makeGuess() {
         if (!isGameOver()) {
-            ch_push({guess: guess});
+            ch_push(guess, playerName);
         }
     }
 
