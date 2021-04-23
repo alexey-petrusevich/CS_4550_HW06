@@ -382,12 +382,12 @@ function GameOver({state}) {
                     </div>
                     <div className="column">
                         <p>
-                            {wins.get(playerName)}
+                            {wins[playerName]}
                         </p>
                     </div>
                     <div className="column">
                         <p>
-                            {losses.get(playerName)}
+                            {losses[playerName]}
                         </p>
                     </div>
                 </div>

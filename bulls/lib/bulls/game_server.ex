@@ -106,7 +106,7 @@ defmodule FourDigits.GameServer do
     gameState = Game.startGame(gameState)
     BackupAgent.put(gameName, gameState)
     # start the game timer
-    Process.send_after(self(), :pook, 30_000)
+    Process.send_after(self(), :pook, 20_000)
     {:reply, gameState, gameState}
   end
 
@@ -165,10 +165,10 @@ defmodule FourDigits.GameServer do
       # make all guesses - take current guesses and put them into player's guesses
       # this also updates hints
       newState = Game.makeAllGuesses(gameState)
-      # clear current guesses
-      newState = Game.clearCurrentGuesses(newState)
       # check if the game has been won
       newState = Game.checkWinners(newState)
+      # clear current guesses
+      newState = Game.clearCurrentGuesses(newState)
       IO.inspect("broadcasting new state")
       IO.inspect(newState)
       BackupAgent.put(newState.gameName, newState)
@@ -178,7 +178,7 @@ defmodule FourDigits.GameServer do
         Game.view(newState)
       )
       if (!Game.isGameOver(newState)) do
-        Process.send_after(self(), :pook, 30_000)
+        Process.send_after(self(), :pook, 20_000)
       end
       {:noreply, newState}
     else
