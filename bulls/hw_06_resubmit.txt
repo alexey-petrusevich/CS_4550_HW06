@@ -1,0 +1,16 @@
+HW06 URL: https://inkfish.ntuck-neu.site/subs/10298
+
+Deployed App: http://hw06.quickjohnny.art/
+
+Git: https://github.com/alexey-petrusevich/CS_4550_HW06
+
+What has been fixed:
+- The game became playable
+- The timer has been fixed
+- Concurrent games are possible
+- The game starts when all the players are ready
+- Made observer to observe the game as listed on assignments specs
+- Statistics for wins and losses is displayed as requested
+- Issues with channel have been fixed
+Overall, the game appears to fulfill all required points listed
+on assignments guidelines.
