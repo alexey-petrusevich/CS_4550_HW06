@@ -28,7 +28,6 @@ function state_update(st) {
     if (callback) {
         callback(st);
     }
-    console.log("New State", st)
 }
 
 export function ch_join(cb) {
@@ -38,7 +37,6 @@ export function ch_join(cb) {
 
 // update the socket with new channel given the name of the game
 function updateChannel(gameName) {
-    console.log("in updateChannel, gameName = " + gameName)
     channel = socket.channel("game:" + gameName, {})
     channel.join()
         .receive("ok", state_update)
@@ -52,8 +50,6 @@ export function ch_login(playerName, gameName) {
     // update channel with new gameName
     updateChannel(gameName)
 
-    console.log(
-        "ch_login called, playerName: " + playerName + " gameName: " + gameName)
     channel.push("login", {playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -64,8 +60,6 @@ export function ch_login(playerName, gameName) {
 export function ch_ready(playerName, gameName) {
     // update channel with new gameName
     //updateChannel(gameName)
-
-    console.log("ch_ready called")
     channel.push("ready", {playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -85,8 +79,6 @@ export function ch_start(gameName) {
 export function ch_join_as_observer(observerName, gameName) {
     // update channel with new gameName
     updateChannel(gameName)
-
-    console.log("ch_join_as_observer called")
     channel.push("join_as_observer", {observerName: observerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -97,8 +89,6 @@ export function ch_join_as_observer(observerName, gameName) {
 export function ch_join_as_player(playerName, gameName) {
     // update channel with new gameName
     updateChannel(gameName)
-
-    console.log("ch_join_as_player called")
     channel.push("join_as_player", {playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -109,8 +99,6 @@ export function ch_join_as_player(playerName, gameName) {
 export function ch_push(guess, playerName) {
     // update channel with new gameName
     //updateChannel(gameName)
-    console.log("guess: ", guess);
-    console.log("playerName: ", playerName);
     channel.push("guess", {guess: guess, playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {
@@ -122,12 +110,15 @@ export function ch_reset(gameName) {
     // update channel with new gameName
     updateChannel(gameName)
 
-    console.log("ch_reset called")
     channel.push("reset", {})
         .receive("ok", state_update)
         .receive("error", resp => {
             console.log("unable to reset", resp)
         });
+}
+
+export function ch_leave(state) {
+    state_update(state)
 }
 
 channel.on("view", state_update);

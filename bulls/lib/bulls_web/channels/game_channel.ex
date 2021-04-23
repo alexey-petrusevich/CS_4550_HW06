@@ -44,7 +44,13 @@ defmodule BullsWeb.GameChannel do
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
     # add to the list of observers
+    IO.inspect("join as observer")
+    IO.inspect("gameState before updating observe")
+    IO.inspect(gameState)
     gameState = Game.updateObserver(gameState, observerName)
+    FourDigits.BackupAgent.put(gameState.gameName, gameState)
+    IO.inspect("gameState after updateObserver")
+    IO.inspect(gameState)
     view = Game.view(gameState)
     {:reply, {:ok, view}, socket}
   end

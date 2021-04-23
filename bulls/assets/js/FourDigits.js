@@ -9,6 +9,7 @@ import {
     ch_start,
     ch_join_as_player,
     ch_join_as_observer,
+    ch_leave
 } from "./socket";
 
 // to hold the value of the game
@@ -116,9 +117,6 @@ function WaitingPage({state}) {
     function isGameReady() {
         let a = isGameNotFull();
         let b = !allPlayersReady()
-        console.log("gameState", state)
-        console.log("isGameNotFull: ", a)
-        console.log("!allPlayersReady: ", b)
         return a || b;
     }
 
@@ -132,7 +130,8 @@ function WaitingPage({state}) {
                             disabled={isObserver()}>Ready
                     </button>
                     <button onClick={startGame}
-                            disabled={isGameReady()}>Start Game
+                            disabled={isGameReady() || isObserver()}>Start
+                        Game
                     </button>
                     <div className="row">
                         <div className="column">
@@ -207,6 +206,20 @@ function PlayPage({st}) {
         ch_reset();
     }
 
+    function leave() {
+        ch_leave(initState);
+        playerName = "";
+        gameName = "";
+    }
+
+    function isObserver() {
+        return st.observerNames.includes(playerName);
+    }
+
+    function isPlayer() {
+        return st.playerNames.includes(playerName);
+    }
+
     return (
         <div>
             <div className="row">
@@ -221,8 +234,10 @@ function PlayPage({st}) {
                 </div>
                 <div className="column">
                     <p>
-                        <button onClick={makeGuess}>Guess</button>
-                        <button onClick={reset}>Reset</button>
+                        <button onClick={makeGuess}
+                                disabled={!isPlayer()}>Guess
+                        </button>
+                        <button onClick={leave}>Leave Game</button>
                     </p>
                 </div>
             </div>
@@ -232,8 +247,6 @@ function PlayPage({st}) {
     );
 
     function ResultTable({guesses, hints}) {
-        console.log("in ResultTable, inspecting guesses")
-        console.log(guesses)
         let numEntries = guesses["p1"].length;
 
         function pushHeader() {
@@ -300,8 +313,6 @@ function PlayPage({st}) {
         // get header
         let guessesHints = pushHeader();
 
-        console.log("guesses");
-        console.log(guesses);
 
         // push all guesses and hints
         for (let i = 0; i < numEntries; i++) {
@@ -403,6 +414,7 @@ function GameOver({state}) {
         ch_reset(gameName)
     }
 
+
     return (
         <div>
             <div className="row">
@@ -415,20 +427,23 @@ function GameOver({state}) {
     );
 }
 
+
+const initState = {
+    playerGuesses: {},
+    playerHints: {},
+    playerNames: [],
+    observerNames: [],
+    playersReady: {},
+    wins: {},
+    losses: {},
+    gameState: "",
+    status: ""
+};
+
 // this component gets passed to the "root"
 function FourDigits() {
 
-    const [state, setState] = useState({
-        playerGuesses: {},
-        playerHints: {},
-        playerNames: [],
-        observerNames: [],
-        playersReady: {},
-        wins: {},
-        losses: {},
-        gameState: "",
-        status: ""
-    });
+    const [state, setState] = useState(initState);
 
     useEffect(() => {
         ch_join(setState)

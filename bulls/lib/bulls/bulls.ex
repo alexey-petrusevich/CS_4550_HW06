@@ -48,7 +48,7 @@ defmodule FourDigits.Game do
       gameState: :setUp, # :setUp :gameFull :playing :gameOver
       gameName: gameName,
       status: "",
-      secret: generateSecret()
+      secret: generateSecret(),
     }
   end
 
