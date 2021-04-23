@@ -1,3 +1,7 @@
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------
+
 # In this file, we load production configuration and secrets
 # from environment variables. You can also hardcode secrets,
 # although such is generally not recommended and you have to

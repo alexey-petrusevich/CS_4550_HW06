@@ -51,3 +51,7 @@ defmodule BullsWeb.Endpoint do
   plug Plug.Session, @session_options
   plug BullsWeb.Router
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

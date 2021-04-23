@@ -106,7 +106,7 @@ defmodule FourDigits.GameServer do
     gameState = Game.startGame(gameState)
     BackupAgent.put(gameName, gameState)
     # start the game timer
-    Process.send_after(self(), :pook, 20_000)
+    Process.send_after(self(), :pook, 30_000)
     {:reply, gameState, gameState}
   end
 
@@ -125,14 +125,9 @@ defmodule FourDigits.GameServer do
   # from is info about the caller
   # game -> state of the game
   def handle_call({:reset, gameName}, _from, gameState) do
-    IO.inspect("in handle_call reset")
     # create new game
-    IO.inspect("game before creating new and updating")
-    IO.inspect(gameState)
     game = Game.new(gameName)
            |> updateGame(gameState)
-    IO.inspect("game after creating and updating")
-    IO.inspect(game)
     # BackupAgent has already been started by this point
     # replace the game in the backup agent
     BackupAgent.put(gameName, game)
@@ -185,8 +180,6 @@ defmodule FourDigits.GameServer do
       newState = Game.checkWinners(newState)
       # clear current guesses
       newState = Game.clearCurrentGuesses(newState)
-      IO.inspect("broadcasting new state")
-      IO.inspect(newState)
       BackupAgent.put(newState.gameName, newState)
       BullsWeb.Endpoint.broadcast!(
         "game:" <> newState.gameName,
@@ -194,7 +187,7 @@ defmodule FourDigits.GameServer do
         Game.view(newState)
       )
       if (!Game.isGameOver(newState)) do
-        Process.send_after(self(), :pook, 20_000)
+        Process.send_after(self(), :pook, 30_000)
       end
       {:noreply, newState}
     else
@@ -202,3 +195,7 @@ defmodule FourDigits.GameServer do
     end
   end
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

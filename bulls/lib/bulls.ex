@@ -7,3 +7,7 @@ defmodule Bulls do
   if it comes from the database, an external API or others.
   """
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

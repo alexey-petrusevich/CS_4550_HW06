@@ -17,3 +17,7 @@ defmodule FourDigits.BackupAgent do
     end
   end
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

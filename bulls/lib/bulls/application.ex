@@ -37,3 +37,7 @@ defmodule Bulls.Application do
 
 
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

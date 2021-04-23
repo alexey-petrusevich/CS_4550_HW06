@@ -46,3 +46,7 @@ defmodule BullsWeb.Telemetry do
     ]
   end
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

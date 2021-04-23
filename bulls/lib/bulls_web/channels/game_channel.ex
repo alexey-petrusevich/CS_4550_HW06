@@ -44,13 +44,8 @@ defmodule BullsWeb.GameChannel do
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
     # add to the list of observers
-    IO.inspect("join as observer")
-    IO.inspect("gameState before updating observe")
-    IO.inspect(gameState)
     gameState = Game.updateObserver(gameState, observerName)
     FourDigits.BackupAgent.put(gameState.gameName, gameState)
-    IO.inspect("gameState after updateObserver")
-    IO.inspect(gameState)
     view = Game.view(gameState)
     {:reply, {:ok, view}, socket}
   end
@@ -71,22 +66,14 @@ defmodule BullsWeb.GameChannel do
         %{"playerName" => playerName},
         socket
       ) do
-    IO.inspect("handle in join as player")
 
     # retrieve game from the game server
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
-    IO.inspect("gameState (join as player) retrieved from GameServer")
-    IO.inspect(gameState)
     # if the game is still in set up mode, join the game as player
     if (Game.isGameInSetUp(gameState)) do
       # update the game with new player
-      # TODO: fix this -- change from call to Game to GameServer
-      IO.inspect("gameState before updateJoin")
-      IO.inspect(gameState)
       gameState = Game.updateJoin(gameState, playerName)
-      IO.inspect("gameState after updateJoin")
-      IO.inspect(gameState)
       FourDigits.BackupAgent.put(gameState.gameName, gameState)
       # truncate any sensitive info
       view = Game.view(gameState)
@@ -112,33 +99,22 @@ defmodule BullsWeb.GameChannel do
         socket
       ) do
     # retrieve game from the game server
-    IO.inspect("handle_in guess")
     gameName = socket.assigns[:gameName]
-    IO.inspect("gameName:")
-    IO.inspect(gameName)
     gameState = GameServer.peek(gameName)
     # check if the game in progress
     if (Game.isGameInProgress(gameState)) do
-      IO.inspect("game in progress, making guess")
       view = GameServer.makeGuess(gameName, playerName, newGuess)
              # truncate state to what is viewed by the player (everyone?)
              |> Game.view()
       # broadcast the view to everyone connected to the socket
-      IO.inspect("broadcasting (HANDLE_IN GUESS in progress) view")
-      IO.inspect(view)
       broadcast(socket, "view", view)
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
     else
-      IO.inspect("game is not in progress")
       # else game is not in progress - no guessing allowed
       # simply return the game state
       view = Game.view(gameState)
       # broadcast the view to everyone connected to the socket
-      IO.inspect(
-        "broadcasting (HANDLE_IN GUESS not in progress) view"
-      )
-      IO.inspect(view)
       broadcast(socket, "view", view)
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
@@ -151,8 +127,6 @@ defmodule BullsWeb.GameChannel do
     # retrieve game state from the game server
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
-    IO.inspect("retrieved gamestate from gameserver")
-    IO.inspect(gameState)
     # if game is full or in set up state, find the player and mark him ready
     if (Game.isGameFull(gameState)
         || Game.isGameInSetUp(gameState)) do
@@ -162,11 +136,8 @@ defmodule BullsWeb.GameChannel do
       view = socket.assigns[:gameName]
              |> GameServer.toggleReady(playerName)
              |> Game.view()
-      IO.inspect("VIEW BEFORE BROADCAST")
-      IO.inspect(view)
       # broadcast the view to everyone connected to the socket
       broadcast(socket, "view", view)
-      IO.inspect("sent broadcast")
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
     else
@@ -185,16 +156,11 @@ defmodule BullsWeb.GameChannel do
 
   @impl true
   def handle_in("start", %{"gameName" => gameName}, socket) do
-    IO.inspect("in handle_in start")
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
-    IO.inspect("gameState before calling startGame")
-    IO.inspect(gameState)
     view = socket.assigns[:gameName]
            |> GameServer.startGame()
            |> Game.view()
-    IO.inspect("VIEW (start) BEFORE BROADCASTING")
-    IO.inspect(view)
     broadcast(socket, "view", view)
     {:reply, {:ok, view}, socket}
   end
@@ -205,7 +171,6 @@ defmodule BullsWeb.GameChannel do
   # this endpoint listens to "reset" messages
   @impl true
   def handle_in("reset", _, socket) do
-    IO.inspect("in game channel reset")
     #    user = socket.assigns[:user]
     view = socket.assigns[:gameName] # get name of the game and pass it to the reset
            # game server will use the saved name to find the name in the Registry
@@ -214,8 +179,6 @@ defmodule BullsWeb.GameChannel do
            |> Game.view(
               ) # truncate all secrets by passing fresh state to the view() method
     # broadcast new view to everyone connected to this socket
-    IO.inspect("broadcasting resetted view")
-    IO.inspect(view)
     broadcast(socket, "view", view)
     # send a reply back to the caller
     {:reply, {:ok, view}, socket}
@@ -244,3 +207,7 @@ defmodule BullsWeb.GameChannel do
     true
   end
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

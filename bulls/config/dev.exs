@@ -1,5 +1,10 @@
 use Mix.Config
 
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

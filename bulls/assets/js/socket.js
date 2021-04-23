@@ -1,3 +1,4 @@
+// completed by using lecture notes of professor Nat Tuck
 import {Socket} from "phoenix";
 
 let socket = new Socket(
@@ -66,7 +67,6 @@ export function ch_ready(playerName, gameName) {
         .receive("error", resp => {
             console.log("unable to select ready", resp)
         });
-    console.log("state updated in ch_ready: ", state)
 }
 
 export function ch_start(gameName) {
@@ -101,10 +101,7 @@ export function ch_join_as_player(playerName, gameName) {
 
 export function ch_push(guess, playerName, gameName) {
     // update channel with new gameName
-    console.log("in ch_push")
-    console.log("gamaName before updateChannel", gameName)
     updateChannel(gameName);
-    console.log("gameName after updateChannel", gameName)
     channel.push("guess", {guess: guess, playerName: playerName})
         .receive("ok", state_update)
         .receive("error", resp => {

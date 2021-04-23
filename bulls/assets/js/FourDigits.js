@@ -1,3 +1,4 @@
+// completed by using lecture notes of professor Nat Tuck
 import React, {useState, useEffect} from 'react'
 import "milligram";
 import {
@@ -200,7 +201,6 @@ function PlayPage({st}) {
 
     function makeGuess() {
         if (!isGameOver()) {
-            console.log("gameName", gameName)
             ch_push(guess, playerName, gameName);
         }
     }

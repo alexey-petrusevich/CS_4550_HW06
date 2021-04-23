@@ -34,3 +34,7 @@ defmodule BullsWeb.UserSocket do
   @impl true
   def id(_socket), do: nil
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------

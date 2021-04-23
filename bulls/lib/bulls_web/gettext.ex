@@ -22,3 +22,7 @@ defmodule BullsWeb.Gettext do
   """
   use Gettext, otp_app: :bulls
 end
+
+# --------------------------------------------------------
+# completed by using lecture notes of professor Nat Tuck
+# --------------------------------------------------------
