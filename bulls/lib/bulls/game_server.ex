@@ -111,12 +111,28 @@ defmodule FourDigits.GameServer do
   end
 
 
+  def updateGame(newGameState, oldGameState) do
+    oldWins = oldGameState.wins
+    oldLosses = oldGameState.losses
+    newWins = Map.merge(newGameState.wins, oldWins)
+    newLosses = Map.merge(newGameState.losses, oldLosses)
+    updatedState = %{newGameState | wins: newWins}
+    updatedState = %{updatedState | losses: newLosses}
+    updatedState
+  end
+
   # here game is retrieved from the registry
   # from is info about the caller
   # game -> state of the game
   def handle_call({:reset, gameName}, _from, gameState) do
+    IO.inspect("in handle_call reset")
     # create new game
+    IO.inspect("game before creating new and updating")
+    IO.inspect(gameState)
     game = Game.new(gameName)
+           |> updateGame(gameState)
+    IO.inspect("game after creating and updating")
+    IO.inspect(game)
     # BackupAgent has already been started by this point
     # replace the game in the backup agent
     BackupAgent.put(gameName, game)

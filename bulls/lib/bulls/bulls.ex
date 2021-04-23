@@ -67,20 +67,32 @@ defmodule FourDigits.Game do
 
   # updates given game state with a new user joins
   def updateJoin(gameState, playerName) do
+    IO.inspect("in updateJoin")
     # if the game is full or is playing
     if (!isGameInSetUp(gameState)) do
       # game is not un set up state - no update
       gameState
     else
+      IO.inspect("game is in set up")
       # else add new player
       # add player to the list of playerNames
+
       playerNames = gameState.playerNames ++ [playerName]
+      IO.inspect("added playerNames")
+      IO.inspect("gameState before updating playerNames")
+      IO.inspect(gameState)
       # create new state wth new list of playerNames
       newState = %{gameState | playerNames: playerNames}
+      IO.inspect("updated gameState with new names")
+      IO.inspect(newState)
       # add player to the playerMap
       newState = addToPlayerMap(newState, playerName)
+      IO.inspect("added to playerMap gameState:")
+      IO.inspect(newState)
       # add player to wins and losses (if not present)
       newState = addToWinsLosses(newState, playerName)
+      IO.inspect("added to wins and losses gameState")
+      IO.inspect(newState)
       # check if the game is full, and update game state if so
       if (isGameFull(newState)) do
         # game is full, update game state
@@ -97,15 +109,22 @@ defmodule FourDigits.Game do
   # if player is already there, returns original gameState
   # assumes that both or neither wins and losses have the player
   def addToWinsLosses(gameState, playerName) do
+    #IO.inspect("in addToWinsLosses")
     # get player atom (key) given playerName
-    player = getPlayerAtom(gameState, playerName)
+    #player = getPlayerAtom(gameState, playerName)
+    #IO.inspect("got playerAtom")
+    #IO.inspect(player)
     # get wins maps
     wins = gameState.wins
+    IO.inspect("got player wins")
+    IO.inspect(wins)
     # get losses map
     losses = gameState.losses
+    IO.inspect("got player losses")
+    IO.inspect(losses)
     # if there's no entry for the given player, add this player to the map of
     # wins and losses
-    if (Map.get(wins, player) == nil) do
+    if (Map.get(wins, playerName) == nil) do
       # add new entry to wins
       wins = Map.put(wins, playerName, 0)
       # add new entry to losses
@@ -359,6 +378,8 @@ defmodule FourDigits.Game do
   end
 
   def isPlayerWinner(gameState, playerName) do
+    # taken from here
+    # https://stackoverflow.com/questions/37375727/how-to-get-key-for-value-in-map
     winnerKey = gameState.playerMap
     |> Enum.find(fn {key, val} -> val == playerName end)
     |> elem(0)

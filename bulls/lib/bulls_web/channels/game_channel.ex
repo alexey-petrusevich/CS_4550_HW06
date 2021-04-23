@@ -65,17 +65,25 @@ defmodule BullsWeb.GameChannel do
         %{"playerName" => playerName},
         socket
       ) do
+    IO.inspect("handle in join as player")
+
     # retrieve game from the game server
     gameState = socket.assigns[:gameName]
                 |> GameServer.peek()
+    IO.inspect("gameState (join as player) retrieved from GameServer")
+    IO.inspect(gameState)
     # if the game is still in set up mode, join the game as player
     if (Game.isGameInSetUp(gameState)) do
       # update the game with new player
       # TODO: fix this -- change from call to Game to GameServer
+      IO.inspect("gameState before updateJoin")
+      IO.inspect(gameState)
       gameState = Game.updateJoin(gameState, playerName)
+      IO.inspect("gameState after updateJoin")
+      IO.inspect(gameState)
+      FourDigits.BackupAgent.put(gameState.gameName, gameState)
       # truncate any sensitive info
       view = Game.view(gameState)
-      FourDigits.BackupAgent.put(gameState.gameName, gameState)
       {:reply, {:ok, view}, socket}
     else
       # else game is full, in progress, or game over
@@ -180,6 +188,7 @@ defmodule BullsWeb.GameChannel do
   # this endpoint listens to "reset" messages
   @impl true
   def handle_in("reset", _, socket) do
+    IO.inspect("in game channel reset")
     #    user = socket.assigns[:user]
     view = socket.assigns[:gameName] # get name of the game and pass it to the reset
            # game server will use the saved name to find the name in the Registry
@@ -188,6 +197,8 @@ defmodule BullsWeb.GameChannel do
            |> Game.view(
               ) # truncate all secrets by passing fresh state to the view() method
     # broadcast new view to everyone connected to this socket
+    IO.inspect("broadcasting resetted view")
+    IO.inspect(view)
     broadcast(socket, "view", view)
     # send a reply back to the caller
     {:reply, {:ok, view}, socket}
