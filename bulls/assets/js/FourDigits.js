@@ -76,7 +76,7 @@ function JoinPage({state}) {
         <div className="row">
             <div className="column">
                 <h1>Bulls and Cows</h1>
-                <h2>Join {gameName} as</h2>
+                <h2>Join {gameName} as {playerName}</h2>
                 <br/>
                 <button onClick={asPlayer}
                         disabled={isGameFull()}>Player
@@ -120,6 +120,14 @@ function WaitingPage({state}) {
         return a || b;
     }
 
+    function playerReady(readyFlag) {
+        if (readyFlag) {
+            return "Ready";
+        } else {
+            return "Not Ready";
+        }
+    }
+
     return (
         <div className="container">
             <div className="row">
@@ -149,16 +157,16 @@ function WaitingPage({state}) {
                     </div>
                     <div className="row">
                         <div className="column">
-                            {state.playersReady.p1.toString()}
+                            {playerReady(state.playersReady.p1)}
                         </div>
                         <div className="column">
-                            {state.playersReady.p2.toString()}
+                            {playerReady(state.playersReady.p2)}
                         </div>
                         <div className="column">
-                            {state.playersReady.p3.toString()}
+                            {playerReady(state.playersReady.p3)}
                         </div>
                         <div className="column">
-                            {state.playersReady.p4.toString()}
+                            {playerReady(state.playersReady.p4)}
                         </div>
                     </div>
                 </div>
@@ -192,7 +200,8 @@ function PlayPage({st}) {
 
     function makeGuess() {
         if (!isGameOver()) {
-            ch_push(guess, playerName);
+            console.log("gameName", gameName)
+            ch_push(guess, playerName, gameName);
         }
     }
 
@@ -414,12 +423,17 @@ function GameOver({state}) {
         ch_reset(gameName)
     }
 
+    function isPlayer() {
+        return state.playerNames.includes(playerName);
+    }
+
 
     return (
         <div>
             <div className="row">
                 <div className="column">
-                    <button onClick={reset}>Reset</button>
+                    <button onClick={reset}
+                    disabled={!isPlayer()}>Reset</button>
                     {winsLosses}
                 </div>
             </div>

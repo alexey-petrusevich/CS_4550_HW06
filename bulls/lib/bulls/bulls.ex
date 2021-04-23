@@ -67,32 +67,21 @@ defmodule FourDigits.Game do
 
   # updates given game state with a new user joins
   def updateJoin(gameState, playerName) do
-    IO.inspect("in updateJoin")
     # if the game is full or is playing
     if (!isGameInSetUp(gameState)) do
       # game is not un set up state - no update
       gameState
     else
-      IO.inspect("game is in set up")
       # else add new player
       # add player to the list of playerNames
 
       playerNames = gameState.playerNames ++ [playerName]
-      IO.inspect("added playerNames")
-      IO.inspect("gameState before updating playerNames")
-      IO.inspect(gameState)
       # create new state wth new list of playerNames
       newState = %{gameState | playerNames: playerNames}
-      IO.inspect("updated gameState with new names")
-      IO.inspect(newState)
       # add player to the playerMap
       newState = addToPlayerMap(newState, playerName)
-      IO.inspect("added to playerMap gameState:")
-      IO.inspect(newState)
       # add player to wins and losses (if not present)
       newState = addToWinsLosses(newState, playerName)
-      IO.inspect("added to wins and losses gameState")
-      IO.inspect(newState)
       # check if the game is full, and update game state if so
       if (isGameFull(newState)) do
         # game is full, update game state
@@ -109,19 +98,10 @@ defmodule FourDigits.Game do
   # if player is already there, returns original gameState
   # assumes that both or neither wins and losses have the player
   def addToWinsLosses(gameState, playerName) do
-    #IO.inspect("in addToWinsLosses")
-    # get player atom (key) given playerName
-    #player = getPlayerAtom(gameState, playerName)
-    #IO.inspect("got playerAtom")
-    #IO.inspect(player)
     # get wins maps
     wins = gameState.wins
-    IO.inspect("got player wins")
-    IO.inspect(wins)
     # get losses map
     losses = gameState.losses
-    IO.inspect("got player losses")
-    IO.inspect(losses)
     # if there's no entry for the given player, add this player to the map of
     # wins and losses
     if (Map.get(wins, playerName) == nil) do
@@ -349,20 +329,9 @@ defmodule FourDigits.Game do
 
   # increments wins and losses for all the winners and losers
   def incrementWinsLosses(gameState) do
-    IO.inspect("in incrementWinsLosses")
     # get players keys
     playerKeys = Map.keys(gameState.playerMap)
-    IO.inspect("got map keys")
-    IO.inspect(playerKeys)
-    # call helper to increment score for every player in this game
-    #IO.inspect("calling stringsAsAtoms")
-    #playerNameKeys = stringsAsAtoms(gameState.playerNames, [])
-    #IO.inspect("playerNameKeys")
-    #IO.inspect(playerNameKeys)
-    #IO.inspect("calling incrementWinsLossesHelp")
     ret = incrementWinsLossesHelp(gameState, gameState.playerNames)
-    IO.inspect("incrementWInsLossesHelp result")
-    IO.inspect(ret)
     ret
   end
 
@@ -389,47 +358,24 @@ defmodule FourDigits.Game do
 
   # a helper function that increments all the players given player keys
   def incrementWinsLossesHelp(gameState, playerNameKeys) do
-    IO.inspect("in incrementWinsLossesHelp")
     if (length(playerNameKeys) == 0) do
-      IO.inspect("end of list of playerNameKeys")
       # game has been updated
       gameState
     else
-      IO.inspect("playerNameKeys are not empty")
       playerKey = hd(playerNameKeys)
-      IO.inspect("playerKey")
-      IO.inspect(playerKey)
       if (!isPlayerWinner(gameState, playerKey)) do
-        IO.inspect("incrementing loss")
         # increment losses
         lossCount = Map.get(gameState.losses, playerKey)
-        IO.inspect("got loss count")
-        IO.inspect(lossCount)
         lossCount = lossCount + 1
-        IO.inspect("incremented loss count")
-        IO.inspect(lossCount)
         losses = Map.put(gameState.losses, playerKey, lossCount)
-        IO.inspect("got new losses")
-        IO.inspect(losses)
         newState = %{gameState | losses: losses}
-        IO.inspect("updated gameState")
-        IO.inspect(newState)
         incrementWinsLossesHelp(newState, tl(playerNameKeys))
       else
-        IO.inspect("incrementing win")
         # increment wins
         winCount = Map.get(gameState.wins, playerKey)
-        IO.inspect("got win count")
-        IO.inspect(winCount)
         winCount = winCount + 1
-        IO.inspect("incremented win count")
-        IO.inspect(winCount)
         wins = Map.put(gameState.wins, playerKey, winCount)
-        IO.inspect("got new wins")
-        IO.inspect(wins)
         newState = %{gameState | wins: wins}
-        IO.inspect("update Game State")
-        IO.inspect(newState)
         incrementWinsLossesHelp(newState, tl(playerNameKeys))
       end
     end
@@ -440,24 +386,15 @@ defmodule FourDigits.Game do
   # and updates the game state accordingly
   # to be called by :pook
   def checkWinners(gameState) do
-    IO.inspect("in checkWinner")
-    IO.inspect("gameState before calling updateWinner")
-    IO.inspect(gameState)
     # update winners list (actually map)
     newState = updateWinnersList(gameState, gameState.playerNames)
-    IO.inspect("updated winner list")
-    IO.inspect(newState)
     # check if there is at least one winner
     if (hasWinner(newState, newState.playerNames)) do
-      IO.inspect("game has winner")
       # increment wins and losses
       newState = incrementWinsLosses(newState)
-
-      IO.inspect("changing game state to GameOver")
       # update game state to gameOver
       %{newState | gameState: :gameOver}
     else
-      IO.inspect("no winners")
       # else no winners, return
       newState
     end
@@ -529,39 +466,23 @@ defmodule FourDigits.Game do
   # IMPORTANT NOTE: the list of current guesses shall not be cleared at this point
   # the return state will have updated the map of winners stored withing game state
   def updateWinnersList(gameState, playerNames) do
-    IO.inspect("in updateWinnerList")
     if (length(playerNames) == 0) do
       # winners list has been updated
-      IO.inspect("winner updated")
       gameState
     else
-      IO.inspect("updating players")
       # get the first element from the player names
       playerName = hd(playerNames)
-      IO.inspect("updating winner")
-      IO.inspect(playerName)
       # get player atom (key) given playerName
       player = getPlayerAtom(gameState, playerName)
-      IO.inspect("playerAtom")
-      IO.inspect(player)
       # get player's current guess
       currentGuess = Map.get(gameState.currentGuesses, player)
-      IO.inspect("current guess for this player")
-      IO.inspect(currentGuess)
       # check if the guess is correct
       if (isCorrectGuess(gameState, currentGuess)) do
-        IO.inspect("guess is correct")
         # guess is correct, update the winners list and recur
         newWinners = Map.put(gameState.winners, player, true)
-        IO.inspect("updated winner")
-        IO.inspect("newWinner")
-        IO.inspect(newWinners)
         newState = %{gameState | winners: newWinners}
-        IO.inspect("updated gameState")
-        IO.inspect(newState)
         updateWinnersList(newState, tl(playerNames))
       else
-        IO.inspect("guess incorrect")
         # else player did not guess right: recur with the rest of the list
         updateWinnersList(gameState, tl(playerNames))
       end
@@ -578,23 +499,16 @@ defmodule FourDigits.Game do
   # updates current guesses in the given game state given
   # player name and a new guess
   def updateCurrentGuesses(gameState, playerName, newGuess) do
-    IO.inspect("in updateCurrentGuesses")
     # get player atom (key) given playerName
     player = getPlayerAtom(gameState, playerName)
-    IO.inspect("playerAtom")
-    IO.inspect(player)
     # create new map of current guesses with updated value
     currentGuesses = Map.put(
       gameState.currentGuesses,
       player,
       newGuess
     )
-    IO.inspect("currentGuesses")
-    IO.inspect(currentGuesses)
     # update game state with new current guesses map
     newState = %{gameState | currentGuesses: currentGuesses}
-    IO.inspect("newState (updateCurrentGuesses)")
-    IO.inspect(newState)
     newState
   end
 

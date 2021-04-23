@@ -112,22 +112,33 @@ defmodule BullsWeb.GameChannel do
         socket
       ) do
     # retrieve game from the game server
+    IO.inspect("handle_in guess")
     gameName = socket.assigns[:gameName]
+    IO.inspect("gameName:")
+    IO.inspect(gameName)
     gameState = GameServer.peek(gameName)
     # check if the game in progress
     if (Game.isGameInProgress(gameState)) do
+      IO.inspect("game in progress, making guess")
       view = GameServer.makeGuess(gameName, playerName, newGuess)
              # truncate state to what is viewed by the player (everyone?)
              |> Game.view()
       # broadcast the view to everyone connected to the socket
+      IO.inspect("broadcasting (HANDLE_IN GUESS in progress) view")
+      IO.inspect(view)
       broadcast(socket, "view", view)
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
     else
+      IO.inspect("game is not in progress")
       # else game is not in progress - no guessing allowed
       # simply return the game state
       view = Game.view(gameState)
       # broadcast the view to everyone connected to the socket
+      IO.inspect(
+        "broadcasting (HANDLE_IN GUESS not in progress) view"
+      )
+      IO.inspect(view)
       broadcast(socket, "view", view)
       # send a reply with the view to the caller
       {:reply, {:ok, view}, socket}
