@@ -97,7 +97,7 @@ defmodule FourDigits.GameServer do
   def init(game) do
     # calls :pook every 30 seconds
     # :pook will append any guesses and check for the winners
-    Process.send_after(self(), :pook, 30_000)
+    #Process.send_after(self(), :pook, 30_000)
     {:ok, game} # this is returned if start_link was successful
   end
 
@@ -105,6 +105,8 @@ defmodule FourDigits.GameServer do
   def handle_call({:start, gameName}, _from, gameState) do
     gameState = Game.startGame(gameState)
     BackupAgent.put(gameName, gameState)
+    # start the game timer
+    Process.send_after(self(), :pook, 30_000)
     {:reply, gameState, gameState}
   end
 
@@ -175,6 +177,9 @@ defmodule FourDigits.GameServer do
         "view",
         Game.view(newState)
       )
+      if (!Game.isGameOver(newState)) do
+        Process.send_after(self(), :pook, 30_000)
+      end
       {:noreply, newState}
     else
       {:noreply, gameState}
