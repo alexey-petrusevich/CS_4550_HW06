@@ -240,26 +240,52 @@ function PlayPage({st}) {
             let guessesHints = []
             // push empty column for turn number
             guessesHints.push(
-                <div className="column">
-                    <p>Num Guesses</p>
+                <div className="row">
+                    <div className="column">
+                        <p>Num Guesses</p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P1 Guesses
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P1 Hints
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P2 Guesses
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P2 Hints
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P3 Guesses
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P3 Hints
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P4 Guesses
+                        </p>
+                    </div>
+                    <div className="column">
+                        <p>
+                            P4 Hints
+                        </p>
+                    </div>
                 </div>
             );
-            for (let i = 0; i < 4; ++i) {
-                guessesHints.push(
-                    <div className="column">
-                        <p>
-                            Player {i + 1} Guesses
-                        </p>
-                    </div>
-                );
-                guessesHints.push(
-                    <div className="column">
-                        <p>
-                            Player {i + 1} Hints
-                        </p>
-                    </div>
-                );
-            }
             return guessesHints;
         }
 
@@ -274,8 +300,11 @@ function PlayPage({st}) {
         // get header
         let guessesHints = pushHeader();
 
+        console.log("guesses");
+        console.log(guesses);
+
         // push all guesses and hints
-        for (let i = 0; i < numEntries; ++i) {
+        for (let i = 0; i < numEntries; i++) {
             guessesHints.push(
                 <div className="row">
                     <div className="column">
@@ -287,7 +316,7 @@ function PlayPage({st}) {
                     {pushColumn(hints["p2"][i])}
                     {pushColumn(guesses["p3"][i])}
                     {pushColumn(hints["p3"][i])}
-                    {pushColumn(guesses["4"][i])}
+                    {pushColumn(guesses["p4"][i])}
                     {pushColumn(hints["p4"][i])}
                 </div>
             );

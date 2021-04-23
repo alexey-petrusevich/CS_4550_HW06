@@ -167,6 +167,9 @@ defmodule FourDigits.GameServer do
       newState = Game.clearCurrentGuesses(newState)
       # check if the game has been won
       newState = Game.checkWinners(newState)
+      IO.inspect("broadcasting new state")
+      IO.inspect(newState)
+      BackupAgent.put(newState.gameName, newState)
       BullsWeb.Endpoint.broadcast!(
         "game:" <> newState.gameName,
         "view",

@@ -28,6 +28,7 @@ function state_update(st) {
     if (callback) {
         callback(st);
     }
+    console.log("New State", st)
 }
 
 export function ch_join(cb) {
